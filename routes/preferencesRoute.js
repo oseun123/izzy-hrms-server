@@ -2,7 +2,10 @@ const express = require("express");
 const preferencesController = require("../controllers/preferencesController");
 const rolesController = require("../controllers/rolesController");
 // middidleware
-const { validateRole } = require("../middleware/preferences/roles");
+const {
+  validateRole,
+  validateUpdateRole,
+} = require("../middleware/preferences/roles");
 const { authorizeMiddleware } = require("../middleware/authorize");
 
 const router = express.Router();
@@ -22,5 +25,11 @@ router.post(
 );
 router.get("/roles", authorizeMiddleware, rolesController.getAllRoles);
 router.delete("/roles/:id", authorizeMiddleware, rolesController.deleteRole);
+router.put(
+  "/roles/:id",
+  validateUpdateRole,
+  authorizeMiddleware,
+  rolesController.updateRoles
+);
 
 module.exports = router;

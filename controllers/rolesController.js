@@ -27,6 +27,53 @@ const createRoles = async (req, res, next) => {
     });
   }
 };
+const updateRoles = async (req, res, next) => {
+  try {
+    const { name, permissions } = req.body;
+    const default_req = req.body.default;
+    const role = req.params.id;
+    const sys_role = await Role.findOne({
+      where: { id: role },
+    });
+
+    if (sys_role) {
+      sys_role.set({
+        name,
+        default: default_req,
+      });
+      await sys_role.save();
+      await sys_role.setPermissions([]);
+      await sys_role.setPermissions(permissions);
+    } else {
+      const message = "Invalid role selection.";
+      logError(req, message, req.decoded.id);
+      return res.status(400).send({
+        status: "error",
+        message: message,
+        payload: {},
+      });
+    }
+    // const role = await Role.create({ name, default: default_req });
+    // await role.setPermissions(permissions);
+
+    const message = " Role updated Successfully";
+    logInfo(req, message, req.decoded.id);
+
+    return res.status(200).send({
+      status: "success",
+      message,
+      payload: {},
+    });
+  } catch (error) {
+    const message = error.message;
+    logError(req, message, req.decoded.id);
+    return res.status(400).send({
+      status: "error",
+      message: message,
+      payload: {},
+    });
+  }
+};
 const getAllRoles = async (req, res, next) => {
   try {
     const pageAsNumber = Number.parseInt(req.query.page);
@@ -146,4 +193,5 @@ module.exports = {
   createRoles,
   getAllRoles,
   deleteRole,
+  updateRoles,
 };

@@ -1,5 +1,6 @@
 const validator = require("validator");
 const { Role } = require("../../models");
+const { Op } = require("sequelize");
 
 async function validateRole(req, res, next) {
   const { name, permissions } = req.body;
@@ -58,7 +59,54 @@ async function validateRole(req, res, next) {
   }
   next();
 }
+async function validateUpdateRole(req, res, next) {
+  const { name, permissions } = req.body;
+  const defualt = req.body.default;
+  const role = req.params.id;
+
+  if (!name) {
+    return res.status(400).send({
+      status: "error",
+      message: "Name is required",
+      payload: {},
+    });
+  }
+  if (Array.isArray(permissions) && permissions.length === 0) {
+    return res.status(400).send({
+      status: "error",
+      message: "Kindly select permissions for this role.",
+      payload: {},
+    });
+  }
+  if (defualt) {
+    try {
+      const default_role = await Role.findOne({
+        where: {
+          default: 1,
+          id: {
+            [Op.ne]: role,
+          },
+        },
+      });
+      if (default_role) {
+        return res.status(400).send({
+          status: "error",
+          message: "Default role already exist in the system.",
+          payload: {},
+        });
+      }
+    } catch (error) {
+      return res.status(400).send({
+        status: "error",
+        message: error.message,
+        payload: {},
+      });
+    }
+  }
+  next();
+}
 
 module.exports = {
   validateRole,
+  validateUpdateRole,
 };
