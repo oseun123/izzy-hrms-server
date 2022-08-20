@@ -3,8 +3,9 @@ const jwt = require("jsonwebtoken");
 
 const { JWT_SECRET, JWT_SECRET_REFRESH } = process.env;
 
-const createToken = ({ id, first_name, last_name }, time = "10s") => {
-  console.log({ id, first_name, last_name });
+const createToken = (user, time = "10s") => {
+  const { id, first_name, last_name } = user;
+
   return jwt.sign({ id, first_name, last_name }, JWT_SECRET, {
     expiresIn: time,
   });
@@ -30,6 +31,20 @@ const hashPassword = (password) => {
 const comparePassword = (password, hash) => {
   return bcrypt.compareSync(password, hash);
 };
+const getUserPermissions = (user) => {
+  if (!user.roles) return [];
+  const roles = user.roles;
+  const permissions = [];
+  roles.forEach((role) => {
+    permissions.push(role.permissions);
+  });
+  const perms_arr = permissions.flat();
+  const ids = perms_arr.map((o) => o.id);
+  const filtered = perms_arr.filter(
+    ({ id }, index) => !ids.includes(id, index + 1)
+  );
+  return filtered;
+};
 
 module.exports = {
   createToken,
@@ -38,4 +53,5 @@ module.exports = {
   comparePassword,
   createRefreshToken,
   verifyTokenRefresh,
+  getUserPermissions,
 };

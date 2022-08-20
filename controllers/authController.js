@@ -1,4 +1,10 @@
-const { User, UserSession, PasswordReset } = require("../models");
+const {
+  User,
+  UserSession,
+  PasswordReset,
+  Role,
+  Permission,
+} = require("../models");
 const sendEmail = require("../utils/sendEmail");
 const {
   createToken,
@@ -7,6 +13,7 @@ const {
   comparePassword,
   createRefreshToken,
   verifyTokenRefresh,
+  getUserPermissions,
 } = require("../utils/auth");
 const { logInfo, logError } = require("./../utils/helper");
 const { resetLinkTempale } = require("./../utils/template/authTemplate");
@@ -44,7 +51,20 @@ exports.signUp = async (req, res, next) => {
 exports.signIn = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    var user = await User.findOne({ where: { email: email } });
+    var user = await User.findOne({
+      where: { email: email },
+      include: {
+        model: Role,
+        as: "roles",
+        attributes: ["id"],
+        include: {
+          model: Permission,
+          as: "permissions",
+          attributes: ["id", "name", "for", "action", "menu", "url", "module"],
+        },
+      },
+    });
+    // console.log(user);
     if (user && comparePassword(password, user.password)) {
       const token = createToken(user);
       const refreshToken = createRefreshToken(user);
@@ -53,21 +73,31 @@ exports.signIn = async (req, res, next) => {
         refresh_token: refreshToken,
       });
       const message = "Sign in successfully";
-      logInfo(req, message, user);
+      logInfo(req, message, user.id);
       res.cookie(APP_JWT, refreshToken, {
         httpOnly: true,
         sameSite: "None",
         secure: true,
         maxAge: 24 * 60 * 60 * 1000,
       });
+
+      const permissions = getUserPermissions(user);
+
       return res.status(200).send({
         status: "success",
         message,
-        payload: { user: { id: user.id, name: user.name, email }, token },
+        payload: {
+          user: {
+            id: user.id,
+            first_name: user.first_name,
+            permissions,
+          },
+          token,
+        },
       });
     }
     const message = "Invalid email/password combination";
-    logError(req, message, user);
+    logError(req, message, user.id);
     return res.status(400).send({
       status: "error",
       message,
@@ -92,7 +122,7 @@ exports.sendResetLink = async (req, res, next) => {
     var user = await User.findOne({ where: { email: email } });
     if (user === null) {
       const message = "Email not found";
-      logError(req, message, user);
+      logError(req, message, user.id);
       return res.status(400).send({
         status: "error",
         message,
@@ -116,7 +146,7 @@ exports.sendResetLink = async (req, res, next) => {
     );
     if (sent) {
       const message = "Password reset link has been sent successfully";
-      logInfo(req, message, user);
+      logInfo(req, message, user.id);
       return res.status(200).send({
         status: "success",
         message,
@@ -152,7 +182,7 @@ exports.resetPassword = async (req, res, next) => {
         await updatedUser.update({ password: hash });
         tokenDB.destroy();
 
-        logInfo(req, "Password reset successfully", updatedUser);
+        logInfo(req, "Password reset successfully", updatedUser.id);
         return res.status(200).send({
           status: "success",
           message: "Password reset successfully",
@@ -182,7 +212,7 @@ exports.resetPassword = async (req, res, next) => {
         NODE_ENV === "development"
           ? "Invalid Token, Kindly reset password again"
           : "Invalid Token, Kindly reset password again";
-      logError(req, message, updatedUser);
+      logError(req, message, updatedUser.id);
       return res.status(400).send({
         status: "error",
         message,
@@ -212,7 +242,7 @@ exports.logout = async (req, res, next) => {
 
     if (user) {
       const message = "Logout successfully";
-      logInfo(req, message, user);
+      logInfo(req, message, user.id);
       res.clearCookie(APP_JWT, {
         httpOnly: true,
         sameSite: "None",
@@ -232,7 +262,7 @@ exports.logout = async (req, res, next) => {
   } catch (error) {
     const message =
       NODE_ENV === "development" ? error.message : "Something went wrong";
-    logError(req, message, user);
+    logError(req, message, user.id);
     return res.status(400).send({
       status: "error",
       message,
@@ -242,16 +272,18 @@ exports.logout = async (req, res, next) => {
 };
 exports.test = async (req, res, next) => {
   try {
-    const emp = [
-      { name: "Seun", age: "26" },
-      { name: "Bisi", age: "30" },
-      { name: "Kemi", age: "20" },
-    ];
+    const system_perm = await Permission.findAll();
+    console.log(system_perm);
+    // const emp = [
+    //   { name: "Seun", age: "26" },
+    //   { name: "Bisi", age: "30" },
+    //   { name: "Kemi", age: "22" },
+    // ];
     return res.status(200).send({
       status: "success",
       message: "ok",
       payload: {
-        emp,
+        emp: system_perm,
       },
     });
   } catch (error) {
@@ -286,8 +318,7 @@ exports.refresh = async (req, res, next) => {
       },
     });
   } catch (error) {
-    const message =
-      NODE_ENV === "development" ? error.message : "Something went wrong";
+    const message = "Invalid Session. Kindly login again.";
 
     return res.status(400).send({
       status: "error",

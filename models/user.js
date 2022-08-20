@@ -9,6 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsToMany(models.Role, {
+        through: "RoleUsers",
+        as: "roles",
+        foreignKey: "user_id",
+      });
+      this.hasMany(models.AuditLog, {
+        as: "auditlogs",
+        foreignKey: "user_id",
+      });
     }
   }
   User.init(
@@ -23,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "User",
       createdAt: "created_at",
       updatedAt: "updated_at",
+      // underscored: true,
     }
   );
   return User;

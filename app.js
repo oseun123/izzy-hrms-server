@@ -2,6 +2,7 @@ const express = require("express");
 const corsOptions = require("./config/corsOptions");
 const credentials = require("./middleware/credentials");
 const authRoute = require("./routes/authRoute");
+const preferencesRoute = require("./routes/preferencesRoute");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
@@ -33,6 +34,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/auth/", authRoute);
+app.use("/api/preferences/", preferencesRoute);
 
 // Error Handling
 app.use((req, res, next) => {
