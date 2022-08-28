@@ -1,5 +1,6 @@
 const logger = require("./../utils/logger");
-const { AuditLog } = require("./../models");
+const { AuditLog, User,Permission,Role} = require("./../models");
+const {getUserPermissions} = require("./auth")
 
 const getClientAddress = (req) => {
   return {
@@ -48,9 +49,61 @@ const logError = (req, message, user_id = null) => {
   );
 };
 
+const hasPermission= (perm)=>{
+ return async( req,res,next) =>{
+  try{
+     const user_id = req.decoded.id;
+    const user = await User.findOne({
+      where: { id: user_id },
+        include: {
+        model: Role,
+        as: "roles",
+        attributes: ["id"],
+        include: {
+          model: Permission,
+          as: "permissions",
+          attributes: ["id", "name", "for", "action", "menu", "url", "module"],
+        },
+      },
+    });
+    let perm_array=[];
+    const permissions =  getUserPermissions(user);
+    permissions.forEach((permission)=>{
+      perm_array.push(permission.dataValues.action);
+   
+    } 
+  );
+  if(perm_array.includes(perm)){
+    next();
+  }else{
+     const message = "Not authorized to perform this action.";
+    logError(req, message, req.decoded.id);
+    return res.status(400).send({
+      status: "error",
+      message: message,
+      payload: {},
+    });
+
+  }
+
+
+  }catch(error){
+    const message = error.message;
+    logError(req, message, req.decoded.id);
+    return res.status(400).send({
+      status: "error",
+      message: message,
+      payload: {},
+    });
+  }
+  
+ }
+}
+
 module.exports = {
   getClientAddress,
   getUserAgent,
   logInfo,
   logError,
+  hasPermission
 };

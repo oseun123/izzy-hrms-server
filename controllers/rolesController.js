@@ -74,68 +74,38 @@ const updateRoles = async (req, res, next) => {
     });
   }
 };
-const getAllRoles = async (req, res, next) => {
+const updateRolesUsers = async (req, res, next) => {
   try {
-    const pageAsNumber = Number.parseInt(req.query.page);
-    const sizeAsNumber = Number.parseInt(req.query.size);
+    const { users } = req.body;
 
-    let page = 0;
-    if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-      page = pageAsNumber - 1;
-    }
+    console.log(users);
 
-    let size = 10;
-    if (
-      !Number.isNaN(sizeAsNumber) &&
-      !(sizeAsNumber > 10) &&
-      !(sizeAsNumber < 1)
-    ) {
-      size = sizeAsNumber;
-    }
-
-    const roles = await Role.findAll({
-      // attributes: [
-      //   "name",
-      //   "id",
-      //   // [sequelize.fn("count", sequelize.col("users.id")), "sensorCount"],
-      // ],
-      include: [
-        {
-          model: User,
-          as: "users",
-          // attributes: [
-          //   [sequelize.literal("COUNT(DISTINCT(users.id))"), "usercount"],
-          // ],
-          // group: "users.id",
-        },
-        {
-          model: Permission,
-          as: "permissions",
-          // attributes: [
-          //   [
-          //     sequelize.literal("COUNT(DISTINCT(permissions.id))"),
-          //     "permissioncount",
-          //   ],
-          // ],
-          // group: "permissions.id",
-        },
-      ],
-      // group: "role.id",
-      limit: size,
-      offset: page * size,
+    // const default_req = req.body.default;
+    const role = req.params.id;
+    const sys_role = await Role.findOne({
+      where: { id: role },
     });
-    const total_count = await Role.count();
-    const message = " Roles fetched create Successfully";
+
+    if (sys_role) {
+      await sys_role.setUsers([]);
+      await sys_role.setUsers(users);
+    } else {
+      const message = "Invalid role selection.";
+      logError(req, message, req.decoded.id);
+      return res.status(400).send({
+        status: "error",
+        message: message,
+        payload: {},
+      });
+    }
+
+    const message = " Users assigned Successfully";
     logInfo(req, message, req.decoded.id);
 
     return res.status(200).send({
       status: "success",
       message,
-      payload: {
-        roles,
-        total_count,
-        total_pages: Math.ceil(total_count / size),
-      },
+      payload: {},
     });
   } catch (error) {
     const message = error.message;
@@ -147,6 +117,119 @@ const getAllRoles = async (req, res, next) => {
     });
   }
 };
+const getAllRoles = async (req, res, next) => {
+  try {
+    const allroles = req.query.all;
+
+    if (allroles === "all") {
+      const roles = await Role.findAll({
+        include: [
+          {
+            model: User,
+            as: "users",
+            // attributes: [
+            //   [sequelize.literal("COUNT(DISTINCT(users.id))"), "usercount"],
+            // ],
+            // group: "users.id",
+          },
+          {
+            model: Permission,
+            as: "permissions",
+            // attributes: [
+            //   [
+            //     sequelize.literal("COUNT(DISTINCT(permissions.id))"),
+            //     "permissioncount",
+            //   ],
+            // ],
+            // group: "permissions.id",
+          },
+        ],
+      });
+
+      const message = " Roles fetched create Successfully";
+      logInfo(req, message, req.decoded.id);
+
+      return res.status(200).send({
+        status: "success",
+        message,
+        payload: {
+          roles,
+        },
+      });
+    } else {
+      const pageAsNumber = Number.parseInt(req.query.page);
+      const sizeAsNumber = Number.parseInt(req.query.size);
+
+      let page = 0;
+      if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
+        page = pageAsNumber - 1;
+      }
+
+      let size = 10;
+      if (
+        !Number.isNaN(sizeAsNumber) &&
+        !(sizeAsNumber > 10) &&
+        !(sizeAsNumber < 1)
+      ) {
+        size = sizeAsNumber;
+      }
+
+      const roles = await Role.findAll({
+        // attributes: [
+        //   "name",
+        //   "id",
+        //   // [sequelize.fn("count", sequelize.col("users.id")), "sensorCount"],
+        // ],
+        include: [
+          {
+            model: User,
+            as: "users",
+            // attributes: [
+            //   [sequelize.literal("COUNT(DISTINCT(users.id))"), "usercount"],
+            // ],
+            // group: "users.id",
+          },
+          {
+            model: Permission,
+            as: "permissions",
+            // attributes: [
+            //   [
+            //     sequelize.literal("COUNT(DISTINCT(permissions.id))"),
+            //     "permissioncount",
+            //   ],
+            // ],
+            // group: "permissions.id",
+          },
+        ],
+        // group: "role.id",
+        limit: size,
+        offset: page * size,
+      });
+      const total_count = await Role.count();
+      const message = " Roles fetched create Successfully";
+      logInfo(req, message, req.decoded.id);
+
+      return res.status(200).send({
+        status: "success",
+        message,
+        payload: {
+          roles,
+          total_count,
+          total_pages: Math.ceil(total_count / size),
+        },
+      });
+    }
+  } catch (error) {
+    const message = error.message;
+    logError(req, message, req.decoded.id);
+    return res.status(400).send({
+      status: "error",
+      message: message,
+      payload: {},
+    });
+  }
+};
+
 const deleteRole = async (req, res, next) => {
   try {
     const role = req.params.id;
@@ -194,4 +277,5 @@ module.exports = {
   getAllRoles,
   deleteRole,
   updateRoles,
+  updateRolesUsers,
 };
