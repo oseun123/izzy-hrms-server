@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "PasswordReset",
+      tableName: "passwordresets",
       createdAt: "created_at",
       updatedAt: "updated_at",
       // underscored: true,

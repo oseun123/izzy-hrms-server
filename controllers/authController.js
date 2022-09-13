@@ -104,8 +104,7 @@ exports.signIn = async (req, res, next) => {
       payload: {},
     });
   } catch (error) {
-    const message =
-      NODE_ENV === "development" ? error.message : "Something went wrong";
+    const message = error.message;
     logError(req, message, user);
     return res.status(400).send({
       status: "error",
@@ -220,13 +219,11 @@ exports.resetPassword = async (req, res, next) => {
       });
     }
   } catch (error) {
-    const message =
-      NODE_ENV === "development" ? error.message : "Something went wrong";
+    const message = error.message;
     logError(req, message, updatedUser);
     return res.status(400).send({
       status: "error",
-      message:
-        NODE_ENV === "development" ? error.message : "Something went wrong",
+      message,
       payload: {},
     });
   }
@@ -260,8 +257,7 @@ exports.logout = async (req, res, next) => {
       });
     }
   } catch (error) {
-    const message =
-      NODE_ENV === "development" ? error.message : "Something went wrong";
+    const message = error.message;
     logError(req, message, user.id);
     return res.status(400).send({
       status: "error",
@@ -288,8 +284,7 @@ exports.test = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error.message);
-    const message =
-      NODE_ENV === "development" ? error.message : "Something went wrong";
+    const message = error.message;
 
     return res.status(400).send({
       status: "error",

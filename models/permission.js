@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsToMany(models.Role, {
-        through: "PermissionRoles",
+        through: "permissionroles",
         as: "roles",
         foreignKey: "permission_id",
         onDelete: "cascade",
@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Permission",
+      tableName: "permissions",
       createdAt: "created_at",
       updatedAt: "updated_at",
       // underscored: true,
