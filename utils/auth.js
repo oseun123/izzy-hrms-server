@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const { JWT_SECRET, JWT_SECRET_REFRESH } = process.env;
 
-const createToken = (user, time = "24h") => {
+const createToken = (user, time = "30s") => {
   const { id, first_name, last_name } = user;
 
   return jwt.sign({ id, first_name, last_name }, JWT_SECRET, {
