@@ -153,8 +153,7 @@ exports.sendResetLink = async (req, res, next) => {
       });
     }
   } catch (error) {
-    const message =
-      NODE_ENV === "development" ? error.message : "Something went wrong";
+    const message = error.message;
     logError(req, message, user);
     return res.status(400).send({
       status: "error",
@@ -207,10 +206,7 @@ exports.resetPassword = async (req, res, next) => {
         });
       }
     } else {
-      const message =
-        NODE_ENV === "development"
-          ? "Invalid Token, Kindly reset password again"
-          : "Invalid Token, Kindly reset password again";
+      const message = "Invalid Token, Kindly reset password again";
       logError(req, message, updatedUser.id);
       return res.status(400).send({
         status: "error",
@@ -299,6 +295,7 @@ exports.refresh = async (req, res, next) => {
     const decoded = verifyTokenRefresh(jwt);
     const session = await UserSession.findOne({
       where: { user_id: decoded.id, refresh_token: jwt },
+      order: [["created_at", "DESC"]],
     });
 
     if (session) {
