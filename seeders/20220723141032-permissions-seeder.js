@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return await queryInterface.bulkInsert("Permissions", [
+    return await queryInterface.bulkInsert("permissions", [
       {
         name: "Personal Dashboard",
         for: "Dashboard",
@@ -43,10 +43,40 @@ module.exports = {
         created_at: new Date(),
         updated_at: new Date(),
       },
+      {
+        name: "Assign Roles",
+        for: "Preferences",
+        menu: 1,
+        module: "Roles",
+        url: "/preferences/assign-roles",
+        action: "ASSIGN_ROLES",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "Create Department",
+        for: "Preferences",
+        menu: 1,
+        module: "Department",
+        url: "/preferences/create-departments",
+        action: "CREATE_DEPARTMENT",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "View Department",
+        for: "Preferences",
+        menu: 1,
+        module: "Department",
+        url: "/preferences/view-departments",
+        action: "VIEW_DEPARTMENT",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
     ]);
   },
 
   down: async (queryInterface, Sequelize) => {
-    return await queryInterface.bulkDelete("Permissions", null, {});
+    return await queryInterface.bulkDelete("permissions", null, {});
   },
 };

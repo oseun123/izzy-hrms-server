@@ -17,7 +17,7 @@ const {
 } = require("../utils/auth");
 const { logInfo, logError } = require("./../utils/helper");
 const { resetLinkTempale } = require("./../utils/template/authTemplate");
-const { NODE_ENV, APP_NAME, APP_MAIL_FROM, APP_JWT } = process.env;
+const { NODE_ENV, APP_NAME, APP_MAIL_FROM, APP_JWT_COOKIE } = process.env;
 
 exports.signUp = async (req, res, next) => {
   // console.log(req.body);
@@ -74,7 +74,7 @@ exports.signIn = async (req, res, next) => {
       });
       const message = "Sign in successfully";
       logInfo(req, message, user.id);
-      res.cookie(APP_JWT, refreshToken, {
+      res.cookie(APP_JWT_COOKIE, refreshToken, {
         httpOnly: true,
         sameSite: "None",
         secure: true,
@@ -236,7 +236,7 @@ exports.logout = async (req, res, next) => {
     if (user) {
       const message = "Logout successfully";
       logInfo(req, message, user.id);
-      res.clearCookie(APP_JWT, {
+      res.clearCookie(APP_JWT_COOKIE, {
         httpOnly: true,
         sameSite: "None",
         secure: true,
@@ -291,8 +291,9 @@ exports.test = async (req, res, next) => {
 };
 exports.refresh = async (req, res, next) => {
   try {
-    const jwt = req.cookies[APP_JWT];
+    const jwt = req.cookies[APP_JWT_COOKIE];
     const decoded = verifyTokenRefresh(jwt);
+    console.log(decoded);
     const session = await UserSession.findOne({
       where: { user_id: decoded.id, refresh_token: jwt },
       order: [["created_at", "DESC"]],
@@ -312,7 +313,7 @@ exports.refresh = async (req, res, next) => {
   } catch (error) {
     const message = "Invalid Session. Kindly login again.";
 
-    return res.status(400).send({
+    return res.status(403).send({
       status: "error",
       message: message,
       payload: {},

@@ -1,4 +1,4 @@
-const { Role, sequelize, User, Permission } = require("../models");
+const { Role, User, Permission } = require("../models");
 
 const { logInfo, logError } = require("./../utils/helper");
 
@@ -9,7 +9,7 @@ const createRoles = async (req, res, next) => {
     const role = await Role.create({ name, default: default_req });
     await role.setPermissions(permissions);
 
-    const message = " Role create Successfully";
+    const message = " Role created Successfully";
     logInfo(req, message, req.decoded.id);
 
     return res.status(200).send({
@@ -78,8 +78,6 @@ const updateRolesUsers = async (req, res, next) => {
   try {
     const { users } = req.body;
 
-    console.log(users);
-
     // const default_req = req.body.default;
     const role = req.params.id;
     const sys_role = await Role.findOne({
@@ -117,6 +115,47 @@ const updateRolesUsers = async (req, res, next) => {
     });
   }
 };
+const removeRolesUsers = async (req, res, next) => {
+  try {
+    const { user } = req.body;
+
+    // const default_req = req.body.default;
+    const role = req.params.id;
+    const sys_role = await Role.findOne({
+      where: { id: role },
+    });
+
+    if (sys_role) {
+      await sys_role.removeUser(user);
+    } else {
+      const message = "Invalid role selection.";
+      logError(req, message, req.decoded.id);
+      return res.status(400).send({
+        status: "error",
+        message: message,
+        payload: {},
+      });
+    }
+
+    const message = " User remove successfully";
+    logInfo(req, message, req.decoded.id);
+
+    return res.status(200).send({
+      status: "success",
+      message,
+      payload: {},
+    });
+  } catch (error) {
+    const message = error.message;
+    logError(req, message, req.decoded.id);
+    return res.status(400).send({
+      status: "error",
+      message: message,
+      payload: {},
+    });
+  }
+};
+
 const getAllRoles = async (req, res, next) => {
   try {
     const allroles = req.query.all;
@@ -127,10 +166,7 @@ const getAllRoles = async (req, res, next) => {
           {
             model: User,
             as: "users",
-            // attributes: [
-            //   [sequelize.literal("COUNT(DISTINCT(users.id))"), "usercount"],
-            // ],
-            // group: "users.id",
+            attributes: { exclude: ["password"] },
           },
           {
             model: Permission,
@@ -146,7 +182,7 @@ const getAllRoles = async (req, res, next) => {
         ],
       });
 
-      const message = " Roles fetched create Successfully";
+      const message = " Roles fetched successfully";
       logInfo(req, message, req.decoded.id);
 
       return res.status(200).send({
@@ -184,10 +220,7 @@ const getAllRoles = async (req, res, next) => {
           {
             model: User,
             as: "users",
-            // attributes: [
-            //   [sequelize.literal("COUNT(DISTINCT(users.id))"), "usercount"],
-            // ],
-            // group: "users.id",
+            attributes: { exclude: ["password"] },
           },
           {
             model: Permission,
@@ -239,6 +272,7 @@ const deleteRole = async (req, res, next) => {
         {
           model: User,
           as: "users",
+          attributes: { exclude: ["password"] },
         },
       ],
     });
@@ -278,4 +312,5 @@ module.exports = {
   deleteRole,
   updateRoles,
   updateRolesUsers,
+  removeRolesUsers,
 };

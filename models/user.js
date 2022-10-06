@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
         as: "auditlogs",
         foreignKey: "user_id",
       });
+
+      this.belongsTo(models.Department, {
+        foreignKey: "department_id",
+        as: "department",
+      });
     }
   }
   User.init(
@@ -26,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       last_name: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
+      department_id: DataTypes.INTEGER,
     },
     {
       sequelize,

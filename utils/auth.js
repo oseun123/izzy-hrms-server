@@ -1,12 +1,12 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const { JWT_SECRET, JWT_SECRET_REFRESH } = process.env;
+const { JWT_SECRET_ACCESS, JWT_SECRET_REFRESH } = process.env;
 
-const createToken = (user, time = "30s") => {
+const createToken = (user, time = "15m") => {
   const { id, first_name, last_name } = user;
 
-  return jwt.sign({ id, first_name, last_name }, JWT_SECRET, {
+  return jwt.sign({ id, first_name, last_name }, JWT_SECRET_ACCESS, {
     expiresIn: time,
   });
 };
@@ -17,7 +17,7 @@ const createRefreshToken = ({ id, first_name, last_name }) => {
 };
 
 const verifyToken = (token) => {
-  const decoded = jwt.verify(token, JWT_SECRET);
+  const decoded = jwt.verify(token, JWT_SECRET_ACCESS);
   return decoded;
 };
 const verifyTokenRefresh = (token) => {

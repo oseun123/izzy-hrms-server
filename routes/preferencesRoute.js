@@ -3,6 +3,7 @@ const { hasPermission } = require("../utils/helper");
 const preferencesController = require("../controllers/preferencesController");
 const rolesController = require("../controllers/rolesController");
 const usersController = require("../controllers/usersController");
+const departmentController = require("../controllers/departmentController");
 // middidleware
 const {
   validateRole,
@@ -16,6 +17,12 @@ router.get(
   "/permissions",
   authorizeMiddleware,
   preferencesController.allPermissions
+);
+router.get(
+  "/user-permissions/:user_id",
+  authorizeMiddleware,
+  // hasPermission("VIEW_ROLES"),
+  preferencesController.userPermissions
 );
 // users
 router.get("/users", authorizeMiddleware, usersController.allUsers);
@@ -34,6 +41,7 @@ router.get(
   hasPermission("VIEW_ROLES"),
   rolesController.getAllRoles
 );
+
 router.delete(
   "/roles/:id",
   authorizeMiddleware,
@@ -54,5 +62,32 @@ router.put(
   hasPermission("ASSIGN_ROLES"),
   rolesController.updateRolesUsers
 );
+
+router.put(
+  "/roles-user/:id",
+  // validateUpdateRole,
+  authorizeMiddleware,
+  hasPermission("ASSIGN_ROLES"),
+  rolesController.removeRolesUsers
+);
+
+// end roles
+
+// department
+
+router.post(
+  "/departments",
+  authorizeMiddleware,
+  hasPermission("CREATE_DEPARTMENT"),
+  departmentController.createDepartment
+);
+router.get(
+  "/departments",
+  authorizeMiddleware,
+  hasPermission("VIEW_DEPARTMENT"),
+  departmentController.getAllDepartments
+);
+
+// end department
 
 module.exports = router;

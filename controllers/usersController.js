@@ -24,5 +24,5 @@ const allUsers = async (req, res, next) => {
 };
 
 module.exports = {
-    allUsers,
+  allUsers,
 };
