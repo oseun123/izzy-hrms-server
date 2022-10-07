@@ -4,19 +4,6 @@ const { logInfo, logError } = require("./../utils/helper");
 const createDepartment = async (req, res, next) => {
   try {
     const { name } = req.body;
-    console.log(name);
-    const department_exist = await Department.findOne({ where: { name } });
-    console.log(department_exist);
-    if (department_exist) {
-      const message = "Department name already in the system";
-      logError(req, message, req.decoded.id);
-      return res.status(400).send({
-        status: "error",
-        message: message,
-        payload: {},
-      });
-    }
-
     await Department.create({ name });
 
     const message = "Department created Successfully";
@@ -161,8 +148,52 @@ const deleteDepartment = async (req, res, next) => {
   }
 };
 
+const updateDepartment = async (req, res, next) => {
+  try {
+    const { name } = req.body;
+
+    const department = req.params.id;
+    const sys_department = await Department.findOne({
+      where: { id: department },
+    });
+
+    if (sys_department) {
+      sys_department.set({
+        name,
+      });
+      await sys_department.save();
+    } else {
+      const message = "Invalid department selection.";
+      logError(req, message, req.decoded.id);
+      return res.status(400).send({
+        status: "error",
+        message: message,
+        payload: {},
+      });
+    }
+
+    const message = " Department updated successfully";
+    logInfo(req, message, req.decoded.id);
+
+    return res.status(200).send({
+      status: "success",
+      message,
+      payload: {},
+    });
+  } catch (error) {
+    const message = error.message;
+    logError(req, message, req.decoded.id);
+    return res.status(400).send({
+      status: "error",
+      message: message,
+      payload: {},
+    });
+  }
+};
+
 module.exports = {
   createDepartment,
   getAllDepartments,
   deleteDepartment,
+  updateDepartment,
 };

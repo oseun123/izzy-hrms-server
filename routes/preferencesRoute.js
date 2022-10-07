@@ -9,6 +9,8 @@ const {
   validateRole,
   validateUpdateRole,
 } = require("../middleware/preferences/roles");
+const { validateDepartment } = require("../middleware/preferences/departments");
+
 const { authorizeMiddleware } = require("../middleware/authorize");
 
 const router = express.Router();
@@ -77,6 +79,7 @@ router.put(
 
 router.post(
   "/departments",
+  validateDepartment,
   authorizeMiddleware,
   hasPermission("CREATE_DEPARTMENT"),
   departmentController.createDepartment
@@ -92,6 +95,13 @@ router.delete(
   authorizeMiddleware,
   hasPermission("CREATE_DEPARTMENT"),
   departmentController.deleteDepartment
+);
+router.put(
+  "/departments/:id",
+  validateDepartment,
+  authorizeMiddleware,
+  hasPermission("CREATE_ROLES"),
+  departmentController.updateDepartment
 );
 // end department
 
