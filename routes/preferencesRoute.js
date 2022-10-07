@@ -87,7 +87,12 @@ router.get(
   hasPermission("VIEW_DEPARTMENT"),
   departmentController.getAllDepartments
 );
-
+router.delete(
+  "/departments/:id",
+  authorizeMiddleware,
+  hasPermission("CREATE_DEPARTMENT"),
+  departmentController.deleteDepartment
+);
 // end department
 
 module.exports = router;

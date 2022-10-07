@@ -89,7 +89,7 @@ const getAllDepartments = async (req, res, next) => {
             attributes: { exclude: ["password"] },
           },
         ],
-        // group: "role.id",
+        // group: "department.id",
         limit: size,
         offset: page * size,
       });
@@ -118,7 +118,51 @@ const getAllDepartments = async (req, res, next) => {
   }
 };
 
+const deleteDepartment = async (req, res, next) => {
+  try {
+    const department = req.params.id;
+    const sys_department = await Department.findOne({
+      where: { id: department },
+      include: [
+        {
+          model: User,
+          as: "users",
+          attributes: { exclude: ["password"] },
+        },
+      ],
+    });
+    if (sys_department.dataValues.users.length) {
+      const message = "Cannot delete department with users associated with it.";
+      logError(req, message, req.decoded.id);
+      return res.status(400).send({
+        status: "error",
+        message: message,
+        payload: {},
+      });
+    } else {
+      await sys_department.destroy();
+      const message = "department deleted successfully.";
+      return res.status(200).send({
+        status: "success",
+        message,
+        payload: {
+          department,
+        },
+      });
+    }
+  } catch (error) {
+    const message = error.message;
+    logError(req, message, req.decoded.id);
+    return res.status(400).send({
+      status: "error",
+      message: message,
+      payload: {},
+    });
+  }
+};
+
 module.exports = {
   createDepartment,
   getAllDepartments,
+  deleteDepartment,
 };
