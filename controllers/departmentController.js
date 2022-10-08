@@ -118,6 +118,7 @@ const deleteDepartment = async (req, res, next) => {
         },
       ],
     });
+    console.log(sys_department);
     if (sys_department.dataValues.users.length) {
       const message = "Cannot delete department with users associated with it.";
       logError(req, message, req.decoded.id);

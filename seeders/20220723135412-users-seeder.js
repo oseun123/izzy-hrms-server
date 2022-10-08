@@ -10,6 +10,7 @@ module.exports = {
         password:
           "$2a$12$8Z7mQ2vZsTUp3Hj1.8/YP.VLldS.4JtxdY0C8BEiv24hT9nOS8cjm",
         department_id: 1,
+        gender_id: 1,
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -20,6 +21,7 @@ module.exports = {
         password:
           "$2a$12$8Z7mQ2vZsTUp3Hj1.8/YP.VLldS.4JtxdY0C8BEiv24hT9nOS8cjm",
         department_id: 2,
+        gender_id: 2,
         created_at: new Date(),
         updated_at: new Date(),
       },

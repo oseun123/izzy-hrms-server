@@ -23,6 +23,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "department_id",
         as: "department",
       });
+
+      this.belongsTo(models.Gender, {
+        foreignKey: "gender_id",
+        as: "gender",
+      });
     }
   }
   User.init(
@@ -32,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       password: DataTypes.STRING,
       department_id: DataTypes.INTEGER,
+      gender_id: DataTypes.INTEGER,
     },
     {
       sequelize,
