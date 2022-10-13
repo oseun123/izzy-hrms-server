@@ -4,12 +4,18 @@ const preferencesController = require("../controllers/preferencesController");
 const rolesController = require("../controllers/rolesController");
 const usersController = require("../controllers/usersController");
 const departmentController = require("../controllers/departmentController");
+const genderController = require("../controllers/genderController");
 // middidleware
 const {
   validateRole,
   validateUpdateRole,
 } = require("../middleware/preferences/roles");
 const { validateDepartment } = require("../middleware/preferences/departments");
+const {
+  validateGender,
+  validateDeleteGender,
+  validateUpdateGender,
+} = require("../middleware/preferences/genders");
 
 const { authorizeMiddleware } = require("../middleware/authorize");
 
@@ -32,8 +38,8 @@ router.get("/users", authorizeMiddleware, usersController.allUsers);
 // roles
 router.post(
   "/roles",
-  validateRole,
   authorizeMiddleware,
+  validateRole,
   hasPermission("CREATE_ROLES"),
   rolesController.createRoles
 );
@@ -47,13 +53,13 @@ router.get(
 router.delete(
   "/roles/:id",
   authorizeMiddleware,
-  hasPermission("CREATE_ROLES"),
+  hasPermission("DELETE_ROLES"),
   rolesController.deleteRole
 );
 router.put(
   "/roles/:id",
-  validateUpdateRole,
   authorizeMiddleware,
+  validateUpdateRole,
   hasPermission("CREATE_ROLES"),
   rolesController.updateRoles
 );
@@ -61,7 +67,7 @@ router.put(
   "/roles-users/:id",
   // validateUpdateRole,
   authorizeMiddleware,
-  hasPermission("ASSIGN_ROLES"),
+  hasPermission("EDIT_ROLES"),
   rolesController.updateRolesUsers
 );
 
@@ -79,8 +85,8 @@ router.put(
 
 router.post(
   "/departments",
-  validateDepartment,
   authorizeMiddleware,
+  validateDepartment,
   hasPermission("CREATE_DEPARTMENT"),
   departmentController.createDepartment
 );
@@ -93,16 +99,47 @@ router.get(
 router.delete(
   "/departments/:id",
   authorizeMiddleware,
-  hasPermission("CREATE_DEPARTMENT"),
+  hasPermission("DELETE_DEPARTMENT"),
   departmentController.deleteDepartment
 );
 router.put(
   "/departments/:id",
-  validateDepartment,
   authorizeMiddleware,
-  hasPermission("CREATE_ROLES"),
+  validateDepartment,
+  hasPermission("EDIT_ROLES"),
   departmentController.updateDepartment
 );
 // end department
+
+// genders
+
+router.post(
+  "/genders",
+  authorizeMiddleware,
+  validateGender,
+  hasPermission("CREATE_GENDER"),
+  genderController.createGender
+);
+router.get(
+  "/genders",
+  authorizeMiddleware,
+  hasPermission("VIEW_GENDER"),
+  genderController.getAllGenders
+);
+router.delete(
+  "/genders/:id",
+  authorizeMiddleware,
+  validateDeleteGender,
+  hasPermission("DELETE_GENDER"),
+  genderController.deleteGender
+);
+router.put(
+  "/genders/:id",
+  authorizeMiddleware,
+  validateUpdateGender,
+  hasPermission("EDIT_ROLES"),
+  genderController.updateGender
+);
+// end genders
 
 module.exports = router;

@@ -102,10 +102,26 @@ const hasPermission = (perm) => {
   };
 };
 
+const returnSuccess = (obj) => {
+  return obj.res.status(200).send({
+    status: obj.status,
+    message: obj.message,
+    payload: obj.payload,
+  });
+};
+const returnError = (obj) => {
+  return obj.res.status(400).send({
+    status: obj.status,
+    message: obj.message,
+    payload: obj.payload,
+  });
+};
 module.exports = {
   getClientAddress,
   getUserAgent,
   logInfo,
   logError,
   hasPermission,
+  returnSuccess,
+  returnError,
 };
