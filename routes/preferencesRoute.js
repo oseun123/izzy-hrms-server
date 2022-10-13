@@ -10,7 +10,7 @@ const {
   validateRole,
   validateUpdateRole,
 } = require("../middleware/preferences/roles");
-const { validateDepartment } = require("../middleware/preferences/departments");
+const { validateDepartment,validateDeleteDepartment,validateUpdateDepartment } = require("../middleware/preferences/departments");
 const {
   validateGender,
   validateDeleteGender,
@@ -99,13 +99,14 @@ router.get(
 router.delete(
   "/departments/:id",
   authorizeMiddleware,
+  validateDeleteDepartment,
   hasPermission("DELETE_DEPARTMENT"),
   departmentController.deleteDepartment
 );
 router.put(
   "/departments/:id",
   authorizeMiddleware,
-  validateDepartment,
+  validateUpdateDepartment,
   hasPermission("EDIT_ROLES"),
   departmentController.updateDepartment
 );

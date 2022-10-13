@@ -83,7 +83,12 @@ async function validateUpdateGender(req, res, next) {
       where: { id: gender },
     });
 
-    if (!sys_gender) {
+    if (sys_gender) {
+
+      req.sys_gender = sys_gender;
+      next();
+     
+    } else {
       const message = "Invalid gender selection.";
       logError(req, message, req.decoded.id);
       return returnError({
@@ -92,12 +97,11 @@ async function validateUpdateGender(req, res, next) {
         payload: {},
         res,
       });
-    } else {
-      req.sys_gender = sys_gender;
+      
     }
-    next();
+    
   } catch (error) {
-    console.log("hhhh");
+
     const returnObj = {
       status: "error",
       message: error.message,

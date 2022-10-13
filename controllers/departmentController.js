@@ -1,5 +1,5 @@
 const { Department, User } = require("../models");
-const { logInfo, logError } = require("./../utils/helper");
+const { logInfo, logError,returnError,returnSuccess } = require("./../utils/helper");
 
 const createDepartment = async (req, res, next) => {
   try {
@@ -9,18 +9,20 @@ const createDepartment = async (req, res, next) => {
     const message = "Department created Successfully";
     logInfo(req, message, req.decoded.id);
 
-    return res.status(200).send({
+    return returnSuccess ({
       status: "success",
       message,
       payload: {},
+      res
     });
   } catch (error) {
     const message = error.message;
     logError(req, message, req.decoded.id);
-    return res.status(400).send({
+    return returnError({
       status: "error",
       message: message,
       payload: {},
+      res
     });
   }
 };
@@ -43,12 +45,13 @@ const getAllDepartments = async (req, res, next) => {
       const message = " Department fetched successfully";
       logInfo(req, message, req.decoded.id);
 
-      return res.status(200).send({
+      return returnSuccess({
         status: "success",
         message,
         payload: {
           departments,
         },
+        res
       });
     } else {
       const pageAsNumber = Number.parseInt(req.query.page);
@@ -84,7 +87,7 @@ const getAllDepartments = async (req, res, next) => {
       const message = " Department fetched successfully";
       logInfo(req, message, req.decoded.id);
 
-      return res.status(200).send({
+      return returnSuccess({
         status: "success",
         message,
         payload: {
@@ -92,12 +95,13 @@ const getAllDepartments = async (req, res, next) => {
           total_count,
           total_pages: Math.ceil(total_count / size),
         },
+        res
       });
     }
   } catch (error) {
     const message = error.message;
     logError(req, message, req.decoded.id);
-    return res.status(400).send({
+    return returnError({
       status: "error",
       message: message,
       payload: {},
@@ -107,44 +111,26 @@ const getAllDepartments = async (req, res, next) => {
 
 const deleteDepartment = async (req, res, next) => {
   try {
-    const department = req.params.id;
-    const sys_department = await Department.findOne({
-      where: { id: department },
-      include: [
-        {
-          model: User,
-          as: "users",
-          attributes: { exclude: ["password"] },
-        },
-      ],
-    });
-    console.log(sys_department);
-    if (sys_department.dataValues.users.length) {
-      const message = "Cannot delete department with users associated with it.";
-      logError(req, message, req.decoded.id);
-      return res.status(400).send({
-        status: "error",
-        message: message,
-        payload: {},
-      });
-    } else {
-      await sys_department.destroy();
+  
+     const department= await req.sys_department.destroy();
       const message = "department deleted successfully.";
-      return res.status(200).send({
+      return returnSuccess({
         status: "success",
         message,
         payload: {
-          department,
+          department: department.id,
         },
+        res
       });
-    }
+   
   } catch (error) {
     const message = error.message;
     logError(req, message, req.decoded.id);
-    return res.status(400).send({
+    return returnError({
       status: "error",
       message: message,
       payload: {},
+      res
     });
   }
 };
@@ -152,42 +138,31 @@ const deleteDepartment = async (req, res, next) => {
 const updateDepartment = async (req, res, next) => {
   try {
     const { name } = req.body;
-
-    const department = req.params.id;
-    const sys_department = await Department.findOne({
-      where: { id: department },
-    });
-
-    if (sys_department) {
+    const sys_department =req.sys_department;
+   
       sys_department.set({
         name,
       });
       await sys_department.save();
-    } else {
-      const message = "Invalid department selection.";
-      logError(req, message, req.decoded.id);
-      return res.status(400).send({
-        status: "error",
-        message: message,
-        payload: {},
-      });
-    }
+
 
     const message = " Department updated successfully";
     logInfo(req, message, req.decoded.id);
 
-    return res.status(200).send({
+    return returnSuccess({
       status: "success",
       message,
       payload: {},
+      res
     });
   } catch (error) {
     const message = error.message;
     logError(req, message, req.decoded.id);
-    return res.status(400).send({
+    return returnError({
       status: "error",
       message: message,
       payload: {},
+      res
     });
   }
 };

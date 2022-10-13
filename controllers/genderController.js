@@ -154,7 +154,7 @@ const updateGender = async (req, res, next) => {
     });
     await sys_gender.save();
 
-    const message = " Gender updated successfully";
+    const message = "Gender updated successfully";
     logInfo(req, message, req.decoded.id);
 
     return returnSuccess({

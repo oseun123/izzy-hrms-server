@@ -1,6 +1,6 @@
 const { Role, User, Permission } = require("../models");
 
-const { logInfo, logError } = require("./../utils/helper");
+const { logInfo, logError,returnError,returnSuccess } = require("./../utils/helper");
 
 const createRoles = async (req, res, next) => {
   try {
@@ -12,18 +12,20 @@ const createRoles = async (req, res, next) => {
     const message = " Role created Successfully";
     logInfo(req, message, req.decoded.id);
 
-    return res.status(200).send({
+    return returnSuccess({
       status: "success",
       message,
       payload: {},
+      res
     });
   } catch (error) {
     const message = error.message;
     logError(req, message, req.decoded.id);
-    return res.status(400).send({
+    return returnError({
       status: "error",
       message: message,
       payload: {},
+      res
     });
   }
 };
@@ -47,30 +49,31 @@ const updateRoles = async (req, res, next) => {
     } else {
       const message = "Invalid role selection.";
       logError(req, message, req.decoded.id);
-      return res.status(400).send({
+      return returnError({
         status: "error",
         message: message,
         payload: {},
+        res
       });
     }
-    // const role = await Role.create({ name, default: default_req });
-    // await role.setPermissions(permissions);
 
-    const message = " Role updated Successfully";
+    const message = "Role updated Successfully";
     logInfo(req, message, req.decoded.id);
 
-    return res.status(200).send({
+    return returnSuccess({
       status: "success",
       message,
       payload: {},
+      res
     });
   } catch (error) {
     const message = error.message;
     logError(req, message, req.decoded.id);
-    return res.status(400).send({
+    return returnError({
       status: "error",
       message: message,
       payload: {},
+      res
     });
   }
 };
@@ -90,28 +93,31 @@ const updateRolesUsers = async (req, res, next) => {
     } else {
       const message = "Invalid role selection.";
       logError(req, message, req.decoded.id);
-      return res.status(400).send({
+      return returnError({
         status: "error",
         message: message,
         payload: {},
+        res
       });
     }
 
     const message = " Users assigned Successfully";
     logInfo(req, message, req.decoded.id);
 
-    return res.status(200).send({
+    return returnSuccess({
       status: "success",
       message,
       payload: {},
+      res
     });
   } catch (error) {
     const message = error.message;
     logError(req, message, req.decoded.id);
-    return res.status(400).send({
+    return returnError({
       status: "error",
       message: message,
       payload: {},
+      res
     });
   }
 };
@@ -130,28 +136,31 @@ const removeRolesUsers = async (req, res, next) => {
     } else {
       const message = "Invalid role selection.";
       logError(req, message, req.decoded.id);
-      return res.status(400).send({
+      return returnError({
         status: "error",
         message: message,
         payload: {},
+        res
       });
     }
 
     const message = " User remove successfully";
     logInfo(req, message, req.decoded.id);
 
-    return res.status(200).send({
+    return returnSuccess({
       status: "success",
       message,
       payload: {},
+      res
     });
   } catch (error) {
     const message = error.message;
     logError(req, message, req.decoded.id);
-    return res.status(400).send({
+    return returnError({
       status: "error",
       message: message,
       payload: {},
+      res
     });
   }
 };
@@ -185,12 +194,13 @@ const getAllRoles = async (req, res, next) => {
       const message = " Roles fetched successfully";
       logInfo(req, message, req.decoded.id);
 
-      return res.status(200).send({
+      return returnSuccess({
         status: "success",
         message,
         payload: {
           roles,
         },
+        res
       });
     } else {
       const pageAsNumber = Number.parseInt(req.query.page);
@@ -242,7 +252,7 @@ const getAllRoles = async (req, res, next) => {
       const message = " Roles fetched create Successfully";
       logInfo(req, message, req.decoded.id);
 
-      return res.status(200).send({
+      return returnSuccess({
         status: "success",
         message,
         payload: {
@@ -250,15 +260,17 @@ const getAllRoles = async (req, res, next) => {
           total_count,
           total_pages: Math.ceil(total_count / size),
         },
+        res
       });
     }
   } catch (error) {
     const message = error.message;
     logError(req, message, req.decoded.id);
-    return res.status(400).send({
+    return returnError({
       status: "error",
       message: message,
       payload: {},
+      res
     });
   }
 };
@@ -279,29 +291,32 @@ const deleteRole = async (req, res, next) => {
     if (sys_role.dataValues.users.length) {
       const message = "Cannot delete role with users associated with it.";
       logError(req, message, req.decoded.id);
-      return res.status(400).send({
+      return returnError({
         status: "error",
         message: message,
         payload: {},
+        res
       });
     } else {
       await sys_role.destroy();
       const message = "Role deleted successfully.";
-      return res.status(200).send({
+      return returnSuccess({
         status: "success",
         message,
         payload: {
           role,
         },
+        res
       });
     }
   } catch (error) {
     const message = error.message;
     logError(req, message, req.decoded.id);
-    return res.status(400).send({
+    return returnError({
       status: "error",
       message: message,
       payload: {},
+      res
     });
   }
 };
