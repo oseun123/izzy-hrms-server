@@ -104,14 +104,14 @@ const hasPermission = (perm) => {
 
 const returnSuccess = (obj) => {
   return obj.res.status(200).send({
-    status: obj.status,
+    status: "success",
     message: obj.message,
     payload: obj.payload,
   });
 };
 const returnError = (obj) => {
   return obj.res.status(400).send({
-    status: obj.status,
+    status: "error",
     message: obj.message,
     payload: obj.payload,
   });

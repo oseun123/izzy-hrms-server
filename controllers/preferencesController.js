@@ -1,5 +1,10 @@
-const { Permission, User, Role } = require("../models");
-const { logInfo, logError } = require("./../utils/helper");
+const { Permission, User, Role, Client } = require("../models");
+const {
+  logInfo,
+  logError,
+  returnSuccess,
+  returnError,
+} = require("./../utils/helper");
 const { getUserPermissions } = require("./../utils/auth");
 
 const allPermissions = async (req, res, next) => {

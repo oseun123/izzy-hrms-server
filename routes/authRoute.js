@@ -14,5 +14,6 @@ router.post("/reset_password/:token", authController.resetPassword);
 router.post("/logout", authorizeMiddleware, authController.logout);
 router.get("/test", authorizeMiddleware, authController.test);
 router.get("/refresh", authController.refresh);
+router.get("/current_client/:client", authController.currentClient);
 
 module.exports = router;

@@ -4,6 +4,7 @@ const {
   PasswordReset,
   Role,
   Permission,
+  Client,
 } = require("../models");
 const sendEmail = require("../utils/sendEmail");
 const {
@@ -15,7 +16,12 @@ const {
   verifyTokenRefresh,
   getUserPermissions,
 } = require("../utils/auth");
-const { logInfo, logError } = require("./../utils/helper");
+const {
+  logInfo,
+  logError,
+  returnError,
+  returnSuccess,
+} = require("./../utils/helper");
 const { resetLinkTempale } = require("./../utils/template/authTemplate");
 const { NODE_ENV, APP_NAME, APP_MAIL_FROM, APP_JWT_COOKIE } = process.env;
 
@@ -74,7 +80,10 @@ exports.signIn = async (req, res, next) => {
       });
       const message = "Sign in successfully";
       logInfo(req, message, user.id);
+      console.log(req.get("origin"));
+
       res.cookie(APP_JWT_COOKIE, refreshToken, {
+        // domain: "localhost",
         httpOnly: true,
         sameSite: "None",
         secure: true,
@@ -317,6 +326,33 @@ exports.refresh = async (req, res, next) => {
       status: "error",
       message: message,
       payload: {},
+    });
+  }
+};
+exports.currentClient = async (req, res, next) => {
+  try {
+    const client = req.params.client;
+
+    const current_cleint = await Client.findOne({
+      where: { name: client },
+    });
+
+    const message = "Client fetched successfully";
+    // logInfo(req, message, req.decoded.id);
+    return returnSuccess({
+      message: message,
+      payload: {
+        current_cleint,
+      },
+      res,
+    });
+  } catch (error) {
+    const message = error.message;
+    // logError(req, message, req.decoded.id);
+    return returnError({
+      message: message,
+      payload: {},
+      res,
     });
   }
 };
