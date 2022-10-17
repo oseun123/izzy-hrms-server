@@ -5,17 +5,35 @@ const rolesController = require("../controllers/rolesController");
 const usersController = require("../controllers/usersController");
 const departmentController = require("../controllers/departmentController");
 const genderController = require("../controllers/genderController");
+const stateController = require("../controllers/stateController");
+const countryController = require("../controllers/countryController");
 // middidleware
 const {
   validateRole,
   validateUpdateRole,
 } = require("../middleware/preferences/roles");
-const { validateDepartment,validateDeleteDepartment,validateUpdateDepartment } = require("../middleware/preferences/departments");
+const {
+  validateDepartment,
+  validateDeleteDepartment,
+  validateUpdateDepartment,
+} = require("../middleware/preferences/departments");
 const {
   validateGender,
   validateDeleteGender,
   validateUpdateGender,
 } = require("../middleware/preferences/genders");
+
+const {
+  validateState,
+  validateDeleteState,
+  validateUpdateState,
+} = require("../middleware/preferences/states");
+
+const {
+  validateCountry,
+  validateDeleteCountry,
+  validateUpdateCountry,
+} = require("../middleware/preferences/country");
 
 const { authorizeMiddleware } = require("../middleware/authorize");
 
@@ -138,9 +156,71 @@ router.put(
   "/genders/:id",
   authorizeMiddleware,
   validateUpdateGender,
-  hasPermission("EDIT_ROLES"),
+  hasPermission("EDIT_GENDER"),
   genderController.updateGender
 );
 // end genders
+
+// states
+
+router.post(
+  "/states",
+  authorizeMiddleware,
+  validateState,
+  hasPermission("CREATE_STATES"),
+  stateController.createState
+);
+router.get(
+  "/states",
+  authorizeMiddleware,
+  hasPermission("VIEW_STATES"),
+  stateController.getAllStates
+);
+router.delete(
+  "/states/:id",
+  authorizeMiddleware,
+  validateDeleteState,
+  hasPermission("DELETE_STATES"),
+  stateController.deleteState
+);
+router.put(
+  "/states/:id",
+  authorizeMiddleware,
+  validateUpdateState,
+  hasPermission("EDIT_STATES"),
+  stateController.updateState
+);
+// end states
+
+// country
+
+router.post(
+  "/countries",
+  authorizeMiddleware,
+  validateCountry,
+  hasPermission("CREATE_COUNTRY"),
+  countryController.createCountry
+);
+router.get(
+  "/countries",
+  authorizeMiddleware,
+  hasPermission("VIEW_COUNTRY"),
+  countryController.getAllCountrys
+);
+router.delete(
+  "/countries/:id",
+  authorizeMiddleware,
+  validateDeleteCountry,
+  hasPermission("DELETE_COUNTRY"),
+  countryController.deleteCountry
+);
+router.put(
+  "/countries/:id",
+  authorizeMiddleware,
+  validateUpdateCountry,
+  hasPermission("EDIT_COUNTRY"),
+  countryController.updateCountry
+);
+// end country
 
 module.exports = router;

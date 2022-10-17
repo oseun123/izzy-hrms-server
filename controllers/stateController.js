@@ -1,4 +1,4 @@
-const { Gender, User } = require("../models");
+const { State, User } = require("../models");
 const {
   logInfo,
   logError,
@@ -6,12 +6,12 @@ const {
   returnError,
 } = require("./../utils/helper");
 
-const createGender = async (req, res, next) => {
+const createState = async (req, res, next) => {
   try {
     const { name } = req.body;
-    await Gender.create({ name });
+    await State.create({ name });
 
-    const message = "Gender created Successfully";
+    const message = "State created Successfully";
     const returnObj = {
       message,
       payload: {},
@@ -32,12 +32,12 @@ const createGender = async (req, res, next) => {
   }
 };
 
-const getAllGenders = async (req, res, next) => {
+const getAllStates = async (req, res, next) => {
   try {
-    const allgenders = req.query.all;
+    const allStates = req.query.all;
 
-    if (allgenders === "all") {
-      const genders = await Gender.findAll({
+    if (allStates === "all") {
+      const states = await State.findAll({
         include: [
           {
             model: User,
@@ -47,12 +47,12 @@ const getAllGenders = async (req, res, next) => {
         ],
       });
 
-      const message = " Gender fetched successfully";
+      const message = " State fetched successfully";
       logInfo(req, message, req.decoded.id);
       const returnObj = {
         message,
         payload: {
-          genders,
+          states,
         },
         res,
       };
@@ -75,7 +75,7 @@ const getAllGenders = async (req, res, next) => {
         size = sizeAsNumber;
       }
 
-      const genders = await Gender.findAll({
+      const states = await State.findAll({
         include: [
           {
             model: User,
@@ -83,17 +83,17 @@ const getAllGenders = async (req, res, next) => {
             attributes: { exclude: ["password"] },
           },
         ],
-        // group: "Gender.id",
+        // group: "State.id",
         limit: size,
         offset: page * size,
       });
-      const total_count = await Gender.count();
-      const message = " Gender fetched successfully";
+      const total_count = await State.count();
+      const message = " State fetched successfully";
       logInfo(req, message, req.decoded.id);
       const returnObj = {
         message,
         payload: {
-          genders,
+          states,
           total_count,
           total_pages: Math.ceil(total_count / size),
         },
@@ -114,16 +114,15 @@ const getAllGenders = async (req, res, next) => {
   }
 };
 
-const deleteGender = async (req, res, next) => {
+const deleteState = async (req, res, next) => {
   try {
-    const gender = await req.gender.destroy();
-    const message = "Gender deleted successfully.";
+    const state = await req.State.destroy();
+    const message = "State deleted successfully.";
     const returnObj = {
       res,
-
       message,
       payload: {
-        gender: gender.id,
+        State: state.id,
       },
     };
     return returnSuccess(returnObj);
@@ -140,16 +139,17 @@ const deleteGender = async (req, res, next) => {
   }
 };
 
-const updateGender = async (req, res, next) => {
+const updateState = async (req, res, next) => {
   try {
     const { name } = req.body;
-    const sys_gender = req.sys_gender;
-    sys_gender.set({
+
+    const sys_state = req.sys_state;
+    sys_state.set({
       name,
     });
-    await sys_gender.save();
+    await sys_state.save();
 
-    const message = "Gender updated successfully";
+    const message = "State updated successfully";
     logInfo(req, message, req.decoded.id);
 
     return returnSuccess({
@@ -169,8 +169,8 @@ const updateGender = async (req, res, next) => {
 };
 
 module.exports = {
-  createGender,
-  getAllGenders,
-  deleteGender,
-  updateGender,
+  createState,
+  getAllStates,
+  deleteState,
+  updateState,
 };

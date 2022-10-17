@@ -28,6 +28,19 @@ module.exports = {
         type: Sequelize.INTEGER,
         references: { model: "genders", key: "id" },
       },
+      country_id: {
+        type: Sequelize.INTEGER,
+        references: { model: "countries", key: "id" },
+      },
+      state_id: {
+        type: Sequelize.INTEGER,
+        references: { model: "states", key: "id" },
+      },
+
+      branch_id: {
+        type: Sequelize.INTEGER,
+        references: { model: "branches", key: "id" },
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,

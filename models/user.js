@@ -28,6 +28,26 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "gender_id",
         as: "gender",
       });
+
+      this.belongsTo(models.Country, {
+        foreignKey: "country_id",
+        as: "country",
+      });
+
+      this.belongsTo(models.State, {
+        foreignKey: "state_id",
+        as: "state",
+      });
+
+      this.belongsTo(models.Branch, {
+        foreignKey: "branch_id",
+        as: "user_branch",
+      });
+      this.belongsToMany(models.Branch, {
+        through: "branchmanagers",
+        as: "manager_branches",
+        foreignKey: "user_id",
+      });
     }
   }
   User.init(
@@ -38,6 +58,9 @@ module.exports = (sequelize, DataTypes) => {
       password: DataTypes.STRING,
       department_id: DataTypes.INTEGER,
       gender_id: DataTypes.INTEGER,
+      branch_id: DataTypes.INTEGER,
+      state_id: DataTypes.INTEGER,
+      country_id: DataTypes.INTEGER,
     },
     {
       sequelize,
