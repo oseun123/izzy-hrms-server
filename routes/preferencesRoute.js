@@ -7,6 +7,8 @@ const departmentController = require("../controllers/departmentController");
 const genderController = require("../controllers/genderController");
 const stateController = require("../controllers/stateController");
 const countryController = require("../controllers/countryController");
+const companyController = require("../controllers/companyController");
+
 // middidleware
 const {
   validateRole,
@@ -34,6 +36,12 @@ const {
   validateDeleteCountry,
   validateUpdateCountry,
 } = require("../middleware/preferences/country");
+
+const {
+  validateCompany,
+  validateDeleteCompany,
+  validateUpdateCompany,
+} = require("../middleware/preferences/company");
 
 const { authorizeMiddleware } = require("../middleware/authorize");
 
@@ -193,7 +201,6 @@ router.put(
 // end states
 
 // country
-
 router.post(
   "/countries",
   authorizeMiddleware,
@@ -222,5 +229,35 @@ router.put(
   countryController.updateCountry
 );
 // end country
+
+// companies
+router.post(
+  "/companies",
+  authorizeMiddleware,
+  validateCompany,
+  hasPermission("CREATE_COMPANY"),
+  companyController.createCompany
+);
+router.get(
+  "/companies",
+  authorizeMiddleware,
+  hasPermission("VIEW_COMPANY"),
+  companyController.getAllCompanies
+);
+router.delete(
+  "/companies/:id",
+  authorizeMiddleware,
+  validateDeleteCompany,
+  hasPermission("DELETE_COMPANY"),
+  companyController.deleteCompany
+);
+router.put(
+  "/companies/:id",
+  authorizeMiddleware,
+  validateUpdateCompany,
+  hasPermission("EDIT_COMPANY"),
+  companyController.updateCompany
+);
+// end company
 
 module.exports = router;

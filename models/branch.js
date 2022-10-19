@@ -36,8 +36,8 @@ module.exports = (sequelize, DataTypes) => {
       code: DataTypes.STRING,
       company_id: DataTypes.INTEGER,
       headquarters: DataTypes.BOOLEAN,
-      state_id: DataTypes.INTEGER,
-      country_id: DataTypes.INTEGER,
+      // state_id: DataTypes.INTEGER,
+      // country_id: DataTypes.INTEGER,
     },
     {
       sequelize,
