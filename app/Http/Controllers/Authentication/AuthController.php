@@ -12,7 +12,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $user = $request->has('username') ? User::where('username', $request->username)->first() : User::where('primary_email', $request->email)->first();
-       
+
         if (Hash::check($request->password, $user->password)) {
             $token = $user->createToken("user")->plainTextToken;
             return successResponse("Logged in successfully", [
@@ -21,7 +21,7 @@ class AuthController extends Controller
                 // "abilities" => $token->accessToken->abilities
             ]);
         } else {
-            return errorResponse("Credential Mismatch", );
+            return errorResponse("Credential Mismatch",);
         }
     }
 }
