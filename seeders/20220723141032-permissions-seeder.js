@@ -23,6 +23,7 @@ module.exports = {
         created_at: new Date(),
         updated_at: new Date(),
       },
+
       {
         name: "Create Roles",
         for: "Preferences",
@@ -276,10 +277,119 @@ module.exports = {
         created_at: new Date(),
         updated_at: new Date(),
       },
+
+      {
+        name: "Create Branch",
+        for: "Preferences",
+        menu: 1,
+        module: "Branch",
+        url: "/preferences/create-branches",
+        action: "CREATE_BRANCH",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "View Branch",
+        for: "Preferences",
+        menu: 1,
+        module: "Branch",
+        url: "/preferences/view-branches",
+        action: "VIEW_BRANCH",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "Edit Branch",
+        for: "Preferences",
+        menu: 0,
+        module: "Branch",
+        url: "",
+        action: "EDIT_BRANCH",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "Delete Branch",
+        for: "Preferences",
+        menu: 0,
+        module: "Branch",
+        url: "",
+        action: "DELETE_BRANCH",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "Display",
+        for: "Preferences",
+        menu: 1,
+        module: "Settings",
+        url: "/preferences/display-settings",
+        action: "SET_DISPLAY",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "Create Employee",
+        for: "Human Resource",
+        menu: 1,
+        module: "Onboarding",
+        url: "/human-resource/create-employee",
+        action: "CREATE_EMPLOYEE",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "Create Designation",
+        for: "Preferences",
+        menu: 1,
+        module: "Designation",
+        url: "/preferences/create-designation",
+        action: "CREATE_DESIGNATION",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "View Designation",
+        for: "Preferences",
+        menu: 1,
+        module: "Designation",
+        url: "/preferences/view-designation",
+        action: "VIEW_DESIGNATION",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "Edit Designation",
+        for: "Preferences",
+        menu: 0,
+        module: "Designation",
+        url: "",
+        action: "EDIT_DESIGNATION",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "Delete Designation",
+        for: "Preferences",
+        menu: 0,
+        module: "Designation",
+        url: "",
+        action: "DELETE_DESIGNATION",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
     ]);
   },
 
   down: async (queryInterface, Sequelize) => {
-    return await queryInterface.bulkDelete("permissions", null, {});
+    // Temporarily disable foreign key checks
+    await queryInterface.sequelize.query("SET FOREIGN_KEY_CHECKS = 0;");
+
+    // Truncate child and parent tables
+    await queryInterface.sequelize.query("TRUNCATE TABLE permissionroles;");
+    await queryInterface.sequelize.query("TRUNCATE TABLE permissions;");
+
+    // Re-enable foreign key checks
+    return await queryInterface.sequelize.query("SET FOREIGN_KEY_CHECKS = 1;");
   },
 };

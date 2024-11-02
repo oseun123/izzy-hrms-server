@@ -9,7 +9,16 @@ module.exports = {
           name: "admin",
           settings: JSON.stringify([
             {
-              name: "admin",
+              name: "Izzy",
+              display: {
+                navbar_variant: {
+                  nav_variant_bg: "navbar-dark",
+                  nav_variant: "navbar-gray",
+                },
+                dark_side_bar_variant: "sidebar-dark-orange ",
+                sidebar_variant: "sidebar-light-warning",
+                brand_variant: "navbar-white",
+              },
             },
           ]),
           created_at: new Date(),

@@ -21,6 +21,9 @@ module.exports = (sequelize, DataTypes) => {
     {
       name: DataTypes.STRING,
       for: DataTypes.STRING,
+      menu: DataTypes.STRING,
+      url: DataTypes.STRING,
+      module: DataTypes.STRING,
       action: DataTypes.STRING,
     },
     {

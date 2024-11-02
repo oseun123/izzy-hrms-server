@@ -1,4 +1,5 @@
 const { Gender, User } = require("../models");
+
 const {
   logInfo,
   logError,
@@ -6,33 +7,50 @@ const {
   returnError,
 } = require("./../utils/helper");
 
+const { NODE_ENV } = process.env;
+
 const createGender = async (req, res, next) => {
+  var log_obj = {
+    action: "create_gender",
+    module: "preferences",
+    sub_module: "gender",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
   try {
     const { name } = req.body;
-    await Gender.create({ name });
-
+    const new_gender = await Gender.create({ name });
     const message = "Gender created Successfully";
-    const returnObj = {
-      message,
-      payload: {},
-      res,
-    };
-    logInfo(req, message, req.decoded.id);
-    return returnSuccess(returnObj);
+    res_obj.message = message;
+    log_obj.payload = JSON.stringify(new_gender);
+
+    logInfo(req, message, req.decoded.id, log_obj);
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    const returnObj = {
-      message,
-      payload: {},
-      res,
-    };
-    logError(req, message, req.decoded.id);
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
 
-    return returnError(returnObj);
+    returnError(res_obj);
   }
 };
 
 const getAllGenders = async (req, res, next) => {
+  var log_obj = {
+    action: "get_gender",
+    module: "preferences",
+    sub_module: "gender",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
+
   try {
     const allgenders = req.query.all;
 
@@ -48,15 +66,14 @@ const getAllGenders = async (req, res, next) => {
       });
 
       const message = " Gender fetched successfully";
-      logInfo(req, message, req.decoded.id);
-      const returnObj = {
-        message,
-        payload: {
-          genders,
-        },
-        res,
+      res_obj.message = message;
+      res_obj.payload = {
+        genders,
       };
-      return returnSuccess(returnObj);
+      log_obj.database = false;
+      logInfo(req, message, req.decoded.id, log_obj);
+
+      returnSuccess(res_obj);
     } else {
       const pageAsNumber = Number.parseInt(req.query.page);
       const sizeAsNumber = Number.parseInt(req.query.size);
@@ -69,7 +86,7 @@ const getAllGenders = async (req, res, next) => {
       let size = 10;
       if (
         !Number.isNaN(sizeAsNumber) &&
-        !(sizeAsNumber > 10) &&
+        sizeAsNumber > 10 &&
         !(sizeAsNumber < 1)
       ) {
         size = sizeAsNumber;
@@ -89,82 +106,98 @@ const getAllGenders = async (req, res, next) => {
       });
       const total_count = await Gender.count();
       const message = " Gender fetched successfully";
-      logInfo(req, message, req.decoded.id);
-      const returnObj = {
-        message,
-        payload: {
-          genders,
-          total_count,
-          total_pages: Math.ceil(total_count / size),
-        },
-        res,
+      res_obj.message = message;
+      res_obj.payload = {
+        genders,
+        total_count,
+        total_pages: Math.ceil(total_count / size),
       };
+      log_obj.database = false;
+      logInfo(req, message, req.decoded.id, log_obj);
 
-      return returnSuccess(returnObj);
+      returnSuccess(res_obj);
     }
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    const returnObj = {
-      message: message,
-      payload: {},
-      res,
-    };
-    return returnError(returnObj);
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
+
+    returnError(res_obj);
   }
 };
 
 const deleteGender = async (req, res, next) => {
+  var log_obj = {
+    action: "delete_gender",
+    module: "preferences",
+    sub_module: "gender",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
+
   try {
     const gender = await req.gender.destroy();
     const message = "Gender deleted successfully.";
-    const returnObj = {
-      res,
 
-      message,
-      payload: {
-        gender: gender.id,
-      },
+    res_obj.message = message;
+
+    res_obj.payload = {
+      gender: gender.id,
     };
-    return returnSuccess(returnObj);
+
+    log_obj.payload = JSON.stringify(gender);
+
+    logInfo(req, message, req.decoded.id, log_obj);
+
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    const returnObj = {
-      res,
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
 
-      message: message,
-      payload: {},
-    };
-    return returnError(returnObj);
+    returnError(res_obj);
   }
 };
 
 const updateGender = async (req, res, next) => {
+  var log_obj = {
+    action: "update_gender",
+    module: "preferences",
+    sub_module: "gender",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
   try {
     const { name } = req.body;
     const sys_gender = req.sys_gender;
     sys_gender.set({
       name,
     });
-    await sys_gender.save();
+    const updated_gender = await sys_gender.save();
 
     const message = "Gender updated successfully";
-    logInfo(req, message, req.decoded.id);
-
-    return returnSuccess({
-      message,
-      payload: {},
-      res,
+    res_obj.message = message;
+    log_obj.payload = JSON.stringify({
+      from: sys_gender,
+      to: updated_gender,
     });
+
+    logInfo(req, message, req.decoded.id, log_obj);
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    return returnError({
-      message: message,
-      payload: {},
-      res,
-    });
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
+    returnError(res_obj);
   }
 };
 

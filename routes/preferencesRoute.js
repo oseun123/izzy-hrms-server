@@ -8,6 +8,7 @@ const genderController = require("../controllers/genderController");
 const stateController = require("../controllers/stateController");
 const countryController = require("../controllers/countryController");
 const companyController = require("../controllers/companyController");
+const branchController = require("../controllers/branchController");
 
 // middidleware
 const {
@@ -42,6 +43,11 @@ const {
   validateDeleteCompany,
   validateUpdateCompany,
 } = require("../middleware/preferences/company");
+const {
+  validateBranch,
+  validateDeleteBranch,
+  validateUpdateBranch,
+} = require("../middleware/preferences/branch");
 
 const { authorizeMiddleware } = require("../middleware/authorize");
 
@@ -259,5 +265,36 @@ router.put(
   companyController.updateCompany
 );
 // end company
+
+// branches
+router.post(
+  "/branches",
+  authorizeMiddleware,
+  validateBranch,
+  hasPermission("CREATE_BRANCH"),
+  branchController.createBranch
+);
+router.get(
+  "/branches",
+  authorizeMiddleware,
+  hasPermission("VIEW_BRANCH"),
+  branchController.getAllBranches
+);
+router.delete(
+  "/branches/:id",
+  authorizeMiddleware,
+  validateDeleteBranch,
+  hasPermission("DELETE_BRANCH"),
+  branchController.deleteBranch
+);
+router.put(
+  "/branches/:id",
+  authorizeMiddleware,
+  validateUpdateBranch,
+  validateBranch,
+  hasPermission("EDIT_BRANCH"),
+  branchController.updateBranch
+);
+// end branch
 
 module.exports = router;

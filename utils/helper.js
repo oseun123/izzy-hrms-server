@@ -15,37 +15,46 @@ const getUserAgent = (req) => {
   };
 };
 
-const logInfo = (req, message, user_id = null) => {
+const logInfo = (req, message, user_id = null, obj = {}) => {
+  const ip = getClientAddress(req);
+  const userAgent = getUserAgent(req);
+  const id = { user_id };
+  if (
+    obj.hasOwnProperty("database") ||
+    (obj.hasOwnProperty("database") && obj.database === true)
+  ) {
+    AuditLog.create({
+      user_id,
+      ip: JSON.stringify(ip),
+      user_agent: JSON.stringify(userAgent),
+      message,
+      level: "success",
+      ...obj,
+    });
+  }
+  return logger.info(
+    `${message}--${JSON.stringify(ip)}--${JSON.stringify(
+      userAgent
+    )}--${JSON.stringify(id)}--${JSON.stringify(obj)}`
+  );
+};
+const logError = (req, message, user_id = null, obj = {}) => {
   const ip = getClientAddress(req);
   const userAgent = getUserAgent(req);
   const id = { user_id };
 
-  // AuditLog.create({
-  //   user_id,
-  //   ip: JSON.stringify(ip),
-  //   user_agent: JSON.stringify(userAgent),
-  //   message,
-  // });
-  return logger.info(
-    `${message}--${JSON.stringify(ip)}--${JSON.stringify(
-      userAgent
-    )}--${JSON.stringify(id)}`
-  );
-};
-const logError = (req, message, user_id = null) => {
-  const ip = getClientAddress(req);
-  const userAgent = getUserAgent(req);
-  const id = { user_id };
-  // AuditLog.create({
-  //   user_id,
-  //   ip: JSON.stringify(ip),
-  //   user_agent: JSON.stringify(userAgent),
-  //   message,
-  // });
+  AuditLog.create({
+    user_id,
+    ip: JSON.stringify(ip),
+    user_agent: JSON.stringify(userAgent),
+    message,
+    level: "error",
+    ...obj,
+  });
   return logger.error(
     `${message}--${JSON.stringify(ip)}--${JSON.stringify(
       userAgent
-    )}--${JSON.stringify(id)}`
+    )}--${JSON.stringify(id)}--${JSON.stringify(obj)}`
   );
 };
 

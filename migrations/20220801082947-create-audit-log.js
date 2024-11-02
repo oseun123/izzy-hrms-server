@@ -12,6 +12,28 @@ module.exports = {
         type: Sequelize.INTEGER,
         references: { model: "users", key: "id" },
       },
+      to_id: {
+        type: Sequelize.INTEGER,
+        references: { model: "users", key: "id" },
+      },
+      level: {
+        type: Sequelize.STRING,
+      },
+      action: {
+        type: Sequelize.STRING,
+      },
+      module: {
+        type: Sequelize.STRING,
+      },
+      sub_module: {
+        type: Sequelize.STRING,
+      },
+      description: {
+        type: Sequelize.STRING,
+      },
+      payload: {
+        type: Sequelize.TEXT,
+      },
       ip: {
         type: Sequelize.STRING,
       },
@@ -30,6 +52,14 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+
+    await queryInterface.addIndex("auditlogs", [
+      "action",
+      "module",
+      "sub_module",
+      "description",
+      "level",
+    ]);
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable("auditlogs");

@@ -6,32 +6,38 @@ async function validateGender(req, res, next) {
   const { name } = req.body;
 
   if (name === "") {
+    const message = "Name is required";
     const returnObj = {
       status: "error",
-      message: "Name is required",
+      message,
       payload: {},
       res,
     };
+    logError(req, message, req.decoded.id);
     return returnError(returnObj);
   } else {
     try {
       const is_name = await Gender.findOne({ where: { name } });
       if (is_name) {
+        const message = "Gender already exist.";
         const returnObj = {
           status: "error",
-          message: "Gender already exist.",
+          message,
           payload: {},
           res,
         };
+        logError(req, message, req.decoded.id);
         return returnError(returnObj);
       }
     } catch (error) {
+      const message = error.message;
       const returnObj = {
         status: "error",
-        message: error.message,
+        message,
         payload: {},
         res,
       };
+      logError(req, message, req.decoded.id);
       return returnError(returnObj);
     }
   }
@@ -84,10 +90,8 @@ async function validateUpdateGender(req, res, next) {
     });
 
     if (sys_gender) {
-
       req.sys_gender = sys_gender;
       next();
-     
     } else {
       const message = "Invalid gender selection.";
       logError(req, message, req.decoded.id);
@@ -97,11 +101,8 @@ async function validateUpdateGender(req, res, next) {
         payload: {},
         res,
       });
-      
     }
-    
   } catch (error) {
-
     const returnObj = {
       status: "error",
       message: error.message,

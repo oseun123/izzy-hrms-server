@@ -15,8 +15,16 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "user_id",
       });
       this.hasMany(models.AuditLog, {
-        as: "auditlogs",
-        foreignKey: "user_id",
+        as: "auditlogs_from",
+        foreignKey: "to_id",
+      });
+      this.hasMany(models.AuditLog, {
+        as: "auditlogs_to",
+        foreignKey: "to_id",
+      });
+      this.hasOne(models.Department, {
+        as: "headOfDepartment",
+        foreignKey: "hod",
       });
 
       this.belongsTo(models.Department, {
@@ -47,6 +55,7 @@ module.exports = (sequelize, DataTypes) => {
         through: "branchmanagers",
         as: "manager_branches",
         foreignKey: "user_id",
+        onDelete: "cascade",
       });
     }
   }
