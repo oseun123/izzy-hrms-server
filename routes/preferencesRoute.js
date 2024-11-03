@@ -9,6 +9,7 @@ const stateController = require("../controllers/stateController");
 const countryController = require("../controllers/countryController");
 const companyController = require("../controllers/companyController");
 const branchController = require("../controllers/branchController");
+const designationController = require("../controllers/designationController");
 
 // middidleware
 const {
@@ -25,6 +26,12 @@ const {
   validateDeleteGender,
   validateUpdateGender,
 } = require("../middleware/preferences/genders");
+
+const {
+  validateDesignation,
+  validateDeleteDesignation,
+  validateUpdateDesignation,
+} = require("../middleware/preferences/designations");
 
 const {
   validateState,
@@ -296,5 +303,36 @@ router.put(
   branchController.updateBranch
 );
 // end branch
+
+// designations
+
+router.post(
+  "/designations",
+  authorizeMiddleware,
+  validateDesignation,
+  hasPermission("CREATE_DESIGNATION"),
+  designationController.createDesignation
+);
+router.get(
+  "/designations",
+  authorizeMiddleware,
+  hasPermission("VIEW_DESIGNATION"),
+  designationController.getAllDesignations
+);
+router.delete(
+  "/designations/:id",
+  authorizeMiddleware,
+  validateDeleteDesignation,
+  hasPermission("DELETE_DESIGNATION"),
+  designationController.deleteDesignation
+);
+router.put(
+  "/designations/:id",
+  authorizeMiddleware,
+  validateUpdateDesignation,
+  hasPermission("EDIT_DESIGNATION"),
+  designationController.updateDesignation
+);
+// end designation
 
 module.exports = router;
