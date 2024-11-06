@@ -40,9 +40,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "designation_id",
         as: "designation",
       });
+
       this.belongsTo(models.EmployeeCategory, {
         foreignKey: "employeecategory_id",
         as: "employeecategory",
+      });
+      this.belongsTo(models.EmployeeStatus, {
+        foreignKey: "employeestatus_id",
+        as: "employeestatus",
       });
 
       this.belongsTo(models.Country, {
@@ -79,6 +84,7 @@ module.exports = (sequelize, DataTypes) => {
       state_id: DataTypes.INTEGER,
       country_id: DataTypes.INTEGER,
       employeecategory_id: DataTypes.INTEGER,
+      employeestatus_id: DataTypes.INTEGER,
       designation_id: DataTypes.INTEGER,
     },
     {
