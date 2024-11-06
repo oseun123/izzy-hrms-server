@@ -10,6 +10,7 @@ const countryController = require("../controllers/countryController");
 const companyController = require("../controllers/companyController");
 const branchController = require("../controllers/branchController");
 const designationController = require("../controllers/designationController");
+const employeeCategoryController = require("../controllers/employeeCategoryController");
 
 // middidleware
 const {
@@ -32,6 +33,12 @@ const {
   validateDeleteDesignation,
   validateUpdateDesignation,
 } = require("../middleware/preferences/designations");
+
+const {
+  validateEmployeeCategory,
+  validateDeleteEmployeeCategory,
+  validateUpdateEmployeeCategory,
+} = require("../middleware/preferences/employeeCategory");
 
 const {
   validateState,
@@ -334,5 +341,36 @@ router.put(
   designationController.updateDesignation
 );
 // end designation
+
+// employee category
+
+router.post(
+  "/employee-category",
+  authorizeMiddleware,
+  validateEmployeeCategory,
+  hasPermission("CREATE_EMPLOYEE_CATEGORY"),
+  employeeCategoryController.createEmployeeCategory
+);
+router.get(
+  "/employee-categories",
+  authorizeMiddleware,
+  hasPermission("VIEW_EMPLOYEE_CATEGORY"),
+  employeeCategoryController.getAllEmployeeCategories
+);
+router.delete(
+  "/employee-category/:id",
+  authorizeMiddleware,
+  validateDeleteEmployeeCategory,
+  hasPermission("DELETE_EMPLOYEE_CATEGORY"),
+  employeeCategoryController.deleteEmployeeCategory
+);
+router.put(
+  "/employee-category/:id",
+  authorizeMiddleware,
+  validateUpdateEmployeeCategory,
+  hasPermission("EDIT_EMPLOYEE_CATEGORY"),
+  employeeCategoryController.updateEmployeeCategory
+);
+// // employee category
 
 module.exports = router;
