@@ -1,8 +1,8 @@
 const validator = require("validator");
-const { Gender, User } = require("../../models");
+const { Designation, User } = require("../../models");
 const { returnError, logError } = require("../../utils/helper");
 
-async function validateGender(req, res, next) {
+async function validateDesignation(req, res, next) {
   const { name } = req.body;
 
   if (name === "") {
@@ -17,9 +17,9 @@ async function validateGender(req, res, next) {
     return returnError(returnObj);
   } else {
     try {
-      const is_name = await Gender.findOne({ where: { name } });
+      const is_name = await Designation.findOne({ where: { name } });
       if (is_name) {
-        const message = "Gender already exist.";
+        const message = "Designation already exist.";
         const returnObj = {
           status: "error",
           message,
@@ -44,11 +44,11 @@ async function validateGender(req, res, next) {
 
   next();
 }
-async function validateDeleteGender(req, res, next) {
+async function validateDeleteDesignation(req, res, next) {
   try {
-    const gender = req.params.id;
-    const sys_gender = await Gender.findOne({
-      where: { id: gender },
+    const designation = req.params.id;
+    const sys_designation = await Designation.findOne({
+      where: { id: designation },
       include: [
         {
           model: User,
@@ -58,8 +58,9 @@ async function validateDeleteGender(req, res, next) {
       ],
     });
 
-    if (sys_gender.dataValues.users.length) {
-      const message = "Cannot delete gender with users associated with it.";
+    if (sys_designation.dataValues.users.length) {
+      const message =
+        "Cannot delete designation with users associated with it.";
       logError(req, message, req.decoded.id);
 
       const returnObj = {
@@ -70,7 +71,7 @@ async function validateDeleteGender(req, res, next) {
       };
       return returnError(returnObj);
     }
-    req.gender = sys_gender;
+    req.designation = sys_designation;
   } catch (error) {
     const returnObj = {
       status: "error",
@@ -82,18 +83,18 @@ async function validateDeleteGender(req, res, next) {
   }
   next();
 }
-async function validateUpdateGender(req, res, next) {
+async function validateUpdateDesignation(req, res, next) {
   try {
-    const gender = req.params.id;
-    const sys_gender = await Gender.findOne({
-      where: { id: gender },
+    const designation = req.params.id;
+    const sys_designation = await Designation.findOne({
+      where: { id: designation },
     });
 
-    if (sys_gender) {
-      req.sys_gender = sys_gender;
+    if (sys_designation) {
+      req.sys_designation = sys_designation;
       next();
     } else {
-      const message = "Invalid gender selection.";
+      const message = "Invalid designation selection.";
       logError(req, message, req.decoded.id);
       return returnError({
         status: "error",
@@ -114,7 +115,7 @@ async function validateUpdateGender(req, res, next) {
 }
 
 module.exports = {
-  validateGender,
-  validateDeleteGender,
-  validateUpdateGender,
+  validateDesignation,
+  validateDeleteDesignation,
+  validateUpdateDesignation,
 };

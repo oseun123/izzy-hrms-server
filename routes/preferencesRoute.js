@@ -8,6 +8,9 @@ const genderController = require("../controllers/genderController");
 const stateController = require("../controllers/stateController");
 const countryController = require("../controllers/countryController");
 const companyController = require("../controllers/companyController");
+const branchController = require("../controllers/branchController");
+const designationController = require("../controllers/designationController");
+const employeeCategoryController = require("../controllers/employeeCategoryController");
 
 // middidleware
 const {
@@ -26,6 +29,18 @@ const {
 } = require("../middleware/preferences/genders");
 
 const {
+  validateDesignation,
+  validateDeleteDesignation,
+  validateUpdateDesignation,
+} = require("../middleware/preferences/designations");
+
+const {
+  validateEmployeeCategory,
+  validateDeleteEmployeeCategory,
+  validateUpdateEmployeeCategory,
+} = require("../middleware/preferences/employeeCategory");
+
+const {
   validateState,
   validateDeleteState,
   validateUpdateState,
@@ -42,6 +57,11 @@ const {
   validateDeleteCompany,
   validateUpdateCompany,
 } = require("../middleware/preferences/company");
+const {
+  validateBranch,
+  validateDeleteBranch,
+  validateUpdateBranch,
+} = require("../middleware/preferences/branch");
 
 const { authorizeMiddleware } = require("../middleware/authorize");
 
@@ -259,5 +279,129 @@ router.put(
   companyController.updateCompany
 );
 // end company
+
+// branches
+router.post(
+  "/branches",
+  authorizeMiddleware,
+  validateBranch,
+  hasPermission("CREATE_BRANCH"),
+  branchController.createBranch
+);
+router.get(
+  "/branches",
+  authorizeMiddleware,
+  hasPermission("VIEW_BRANCH"),
+  branchController.getAllBranches
+);
+router.delete(
+  "/branches/:id",
+  authorizeMiddleware,
+  validateDeleteBranch,
+  hasPermission("DELETE_BRANCH"),
+  branchController.deleteBranch
+);
+router.put(
+  "/branches/:id",
+  authorizeMiddleware,
+  validateUpdateBranch,
+  validateBranch,
+  hasPermission("EDIT_BRANCH"),
+  branchController.updateBranch
+);
+// end branch
+
+// designations
+
+router.post(
+  "/designations",
+  authorizeMiddleware,
+  validateDesignation,
+  hasPermission("CREATE_DESIGNATION"),
+  designationController.createDesignation
+);
+router.get(
+  "/designations",
+  authorizeMiddleware,
+  hasPermission("VIEW_DESIGNATION"),
+  designationController.getAllDesignations
+);
+router.delete(
+  "/designations/:id",
+  authorizeMiddleware,
+  validateDeleteDesignation,
+  hasPermission("DELETE_DESIGNATION"),
+  designationController.deleteDesignation
+);
+router.put(
+  "/designations/:id",
+  authorizeMiddleware,
+  validateUpdateDesignation,
+  hasPermission("EDIT_DESIGNATION"),
+  designationController.updateDesignation
+);
+// end designation
+
+// employee category
+
+router.post(
+  "/employee-category",
+  authorizeMiddleware,
+  validateEmployeeCategory,
+  hasPermission("CREATE_EMPLOYEE_CATEGORY"),
+  employeeCategoryController.createEmployeeCategory
+);
+router.get(
+  "/employee-categories",
+  authorizeMiddleware,
+  hasPermission("VIEW_EMPLOYEE_CATEGORY"),
+  employeeCategoryController.getAllEmployeeCategories
+);
+router.delete(
+  "/employee-category/:id",
+  authorizeMiddleware,
+  validateDeleteEmployeeCategory,
+  hasPermission("DELETE_EMPLOYEE_CATEGORY"),
+  employeeCategoryController.deleteEmployeeCategory
+);
+router.put(
+  "/employee-category/:id",
+  authorizeMiddleware,
+  validateUpdateEmployeeCategory,
+  hasPermission("EDIT_EMPLOYEE_CATEGORY"),
+  employeeCategoryController.updateEmployeeCategory
+);
+// // employee category
+
+// employee status
+
+router.post(
+  "/employee-status",
+  authorizeMiddleware,
+  validateEmployeeCategory,
+  hasPermission("CREATE_EMPLOYEE_STATUS"),
+  employeeCategoryController.createEmployeeCategory
+);
+router.get(
+  "/employee-statuses",
+  authorizeMiddleware,
+  hasPermission("VIEW_EMPLOYEE_STATUS"),
+  employeeCategoryController.getAllEmployeeCategories
+);
+router.delete(
+  "/employee-status/:id",
+  authorizeMiddleware,
+  validateDeleteEmployeeCategory,
+  hasPermission("DELETE_EMPLOYEE_STATUS"),
+  employeeCategoryController.deleteEmployeeCategory
+);
+router.put(
+  "/employee-status/:id",
+  authorizeMiddleware,
+  validateUpdateEmployeeCategory,
+  hasPermission("EDIT_EMPLOYEE_STATUS"),
+  employeeCategoryController.updateEmployeeCategory
+);
+// // employee status
 
 module.exports = router;

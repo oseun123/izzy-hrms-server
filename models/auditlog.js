@@ -10,14 +10,26 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.User, {
-        as: "user",
+        as: "from_user",
         foreignKey: "user_id",
+      });
+
+      this.belongsTo(models.User, {
+        as: "to_user",
+        foreignKey: "to_id",
       });
     }
   }
   AuditLog.init(
     {
       user_id: DataTypes.INTEGER,
+      to_id: DataTypes.INTEGER,
+      level: DataTypes.STRING,
+      action: DataTypes.STRING,
+      module: DataTypes.STRING,
+      sub_module: DataTypes.STRING,
+      description: DataTypes.STRING,
+      payload: DataTypes.TEXT,
       ip: DataTypes.STRING,
       user_agent: DataTypes.STRING,
       message: DataTypes.STRING,

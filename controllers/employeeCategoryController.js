@@ -1,16 +1,20 @@
-const { Department, User, sequelize } = require("../models");
+const { EmployeeCategory, User } = require("../models");
+// const designation = require("../models/designation");
+
 const {
   logInfo,
   logError,
-  returnError,
   returnSuccess,
+  returnError,
 } = require("./../utils/helper");
+
 const { NODE_ENV } = process.env;
-const createDepartment = async (req, res, next) => {
+
+const createEmployeeCategory = async (req, res, next) => {
   var log_obj = {
-    action: "create_department",
+    action: "create_employee_category",
     module: "preferences",
-    sub_module: "department",
+    sub_module: "employee category",
     payload: null,
     description: null,
     database: true,
@@ -18,69 +22,56 @@ const createDepartment = async (req, res, next) => {
 
   var res_obj = { res, message: "", payload: {} };
   try {
-    const { name, hod } = req.body;
-
-    const department = await Department.create({ name, hod });
-
-    const message = "Department created Successfully";
+    const { name } = req.body;
+    const new_employeeCategory = await EmployeeCategory.create({ name });
+    const message = "Employee category created successfully";
     res_obj.message = message;
-    log_obj.payload = JSON.stringify(department);
+    log_obj.payload = JSON.stringify(new_employeeCategory);
+
     logInfo(req, message, req.decoded.id, log_obj);
     returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
     res_obj.message =
       NODE_ENV === "development" ? `${message}` : "Something went wrong";
-    logError(req, message, req.decoded.id);
-    return returnError(res_obj);
+    logError(req, message, req.decoded.id, log_obj);
+
+    returnError(res_obj);
   }
 };
 
-const getAllDepartments = async (req, res, next) => {
+const getAllEmployeeCategories = async (req, res, next) => {
   var log_obj = {
-    action: "get_department",
+    action: "get_employee_category",
     module: "preferences",
-    sub_module: "department",
+    sub_module: "employee category",
     payload: null,
     description: null,
+    database: true,
   };
 
   var res_obj = { res, message: "", payload: {} };
 
   try {
-    const alldepartments = req.query.all;
+    const allemployeeCategory = req.query.all;
 
-    if (alldepartments === "all") {
-      const departments = await Department.findAll({
+    if (allemployeeCategory === "all") {
+      const employeeCategory = await EmployeeCategory.findAll({
         include: [
           {
             model: User,
-            as: "headOfDepartment", // Use the correct alias for the hod relationship
-            attributes: {
-              exclude: ["password"],
-              include: [
-                [
-                  sequelize.literal(
-                    "CONCAT(`headOfDepartment`.`first_name`, ' ', `headOfDepartment`.`last_name`)"
-                  ),
-                  "fullname",
-                ],
-              ],
-            },
-          },
-          {
-            model: User,
-            as: "user",
+            as: "users",
             attributes: { exclude: ["password"] },
           },
         ],
       });
 
-      const message = " Department fetched successfully";
+      const message = " Employee category fetched successfully";
       res_obj.message = message;
       res_obj.payload = {
-        departments,
+        employeeCategory,
       };
+      log_obj.database = false;
       logInfo(req, message, req.decoded.id, log_obj);
 
       returnSuccess(res_obj);
@@ -102,59 +93,83 @@ const getAllDepartments = async (req, res, next) => {
         size = sizeAsNumber;
       }
 
-      const departments = await Department.findAll({
+      const employeeCategory = await EmployeeCategory.findAll({
         include: [
-          {
-            model: User,
-            as: "headOfDepartment", // Use the correct alias for the hod relationship
-            attributes: {
-              exclude: ["password"],
-              include: [
-                [
-                  sequelize.literal(
-                    "CONCAT(`headOfDepartment`.`first_name`, ' ', `headOfDepartment`.`last_name`)"
-                  ),
-                  "fullname",
-                ],
-              ],
-            },
-          },
           {
             model: User,
             as: "users",
             attributes: { exclude: ["password"] },
           },
         ],
-        // group: "department.id",
+        // group: "Designation.id",
         limit: size,
         offset: page * size,
       });
-      const total_count = await Department.count();
-      const message = " Department fetched successfully";
+      const total_count = await EmployeeCategory.count();
+      const message = " Employee category fetched successfully";
       res_obj.message = message;
       res_obj.payload = {
-        departments,
+        employeeCategory,
         total_count,
         total_pages: Math.ceil(total_count / size),
       };
+      log_obj.database = false;
       logInfo(req, message, req.decoded.id, log_obj);
-      return returnSuccess(res_obj);
+
+      returnSuccess(res_obj);
     }
   } catch (error) {
     const message = error.message;
     res_obj.message =
       NODE_ENV === "development" ? `${message}` : "Something went wrong";
-
     logError(req, message, req.decoded.id, log_obj);
-    return returnError(res_obj);
+
+    returnError(res_obj);
   }
 };
 
-const deleteDepartment = async (req, res, next) => {
+const deleteEmployeeCategory = async (req, res, next) => {
   var log_obj = {
-    action: "delete_department",
+    action: "delete_employee_category",
     module: "preferences",
-    sub_module: "department",
+    sub_module: "employee category",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
+
+  try {
+    const employeeCategory = await req.employeeCategory.destroy();
+    const message = "Employee category deleted successfully.";
+
+    res_obj.message = message;
+
+    res_obj.payload = {
+      employeeCategory: employeeCategory.id,
+    };
+
+    log_obj.payload = JSON.stringify(employeeCategory);
+
+    logInfo(req, message, req.decoded.id, log_obj);
+
+    returnSuccess(res_obj);
+  } catch (error) {
+    const message = error.message;
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
+
+    returnError(res_obj);
+  }
+};
+
+const updateEmployeeCategory = async (req, res, next) => {
+  var log_obj = {
+    action: "update_employee_category",
+    module: "preferences",
+    sub_module: "employee category",
     payload: null,
     description: null,
     database: true,
@@ -162,10 +177,20 @@ const deleteDepartment = async (req, res, next) => {
 
   var res_obj = { res, message: "", payload: {} };
   try {
-    const department = await req.sys_department.destroy();
-    const message = "department deleted successfully.";
+    const { name } = req.body;
+    const sys_employeeCategory = req.sys_employeeCategory;
+    sys_employeeCategory.set({
+      name,
+    });
+    const updated_sys_employeeCategory = await sys_employeeCategory.save();
+
+    const message = "Employee category updated successfully";
     res_obj.message = message;
-    log_obj.payload = JSON.stringify(department);
+    log_obj.payload = JSON.stringify({
+      from: sys_employeeCategory,
+      to: updated_sys_employeeCategory,
+    });
+
     logInfo(req, message, req.decoded.id, log_obj);
     returnSuccess(res_obj);
   } catch (error) {
@@ -177,48 +202,9 @@ const deleteDepartment = async (req, res, next) => {
   }
 };
 
-const updateDepartment = async (req, res, next) => {
-  var log_obj = {
-    action: "update_department",
-    module: "preferences",
-    sub_module: "department",
-    payload: null,
-    description: null,
-    database: true,
-  };
-
-  var res_obj = { res, message: "", payload: {} };
-  try {
-    const { name } = req.body;
-    const { hod } = req.body;
-    const sys_department = req.sys_department;
-
-    sys_department.set({
-      name,
-      hod,
-    });
-    const updated_department = await sys_department.save();
-
-    const message = " Department updated successfully";
-    res_obj.message = message;
-    log_obj.payload = JSON.stringify({
-      from: sys_department,
-      to: updated_department,
-    });
-    logInfo(req, message, req.decoded.id, log_obj);
-    return returnSuccess(res_obj);
-  } catch (error) {
-    const message = error.message;
-    res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
-    logError(req, message, req.decoded.id, log_obj);
-    return returnError(res_obj);
-  }
-};
-
 module.exports = {
-  createDepartment,
-  getAllDepartments,
-  deleteDepartment,
-  updateDepartment,
+  createEmployeeCategory,
+  getAllEmployeeCategories,
+  deleteEmployeeCategory,
+  updateEmployeeCategory,
 };

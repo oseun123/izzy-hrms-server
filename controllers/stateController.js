@@ -7,25 +7,30 @@ const {
 } = require("./../utils/helper");
 
 const createState = async (req, res, next) => {
+  var log_obj = {
+    action: "create_state",
+    module: "preferences",
+    sub_module: "state",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
+
   try {
     const { name } = req.body;
-    await State.create({ name });
+    const new_state = await State.create({ name });
 
     const message = "State created Successfully";
-    const returnObj = {
-      message,
-      payload: {},
-      res,
-    };
-    logInfo(req, message, req.decoded.id);
-    return returnSuccess(returnObj);
+    res_obj.message = message;
+    log_obj.payload = JSON.stringify(new_state);
+
+    logInfo(req, message, req.decoded.id, log_obj);
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    const returnObj = {
-      message,
-      payload: {},
-      res,
-    };
+
     logError(req, message, req.decoded.id);
 
     return returnError(returnObj);
@@ -33,6 +38,16 @@ const createState = async (req, res, next) => {
 };
 
 const getAllStates = async (req, res, next) => {
+  var log_obj = {
+    action: "get_state",
+    module: "preferences",
+    sub_module: "state",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
   try {
     const allStates = req.query.all;
 
@@ -48,15 +63,14 @@ const getAllStates = async (req, res, next) => {
       });
 
       const message = " State fetched successfully";
-      logInfo(req, message, req.decoded.id);
-      const returnObj = {
-        message,
-        payload: {
-          states,
-        },
-        res,
+      res_obj.message = message;
+      res_obj.payload = {
+        states,
       };
-      return returnSuccess(returnObj);
+      log_obj.database = false;
+      logInfo(req, message, req.decoded.id, log_obj);
+
+      return returnSuccess(res_obj);
     } else {
       const pageAsNumber = Number.parseInt(req.query.page);
       const sizeAsNumber = Number.parseInt(req.query.size);
@@ -69,7 +83,7 @@ const getAllStates = async (req, res, next) => {
       let size = 10;
       if (
         !Number.isNaN(sizeAsNumber) &&
-        !(sizeAsNumber > 10) &&
+        sizeAsNumber > 10 &&
         !(sizeAsNumber < 1)
       ) {
         size = sizeAsNumber;
@@ -89,57 +103,73 @@ const getAllStates = async (req, res, next) => {
       });
       const total_count = await State.count();
       const message = " State fetched successfully";
-      logInfo(req, message, req.decoded.id);
-      const returnObj = {
-        message,
-        payload: {
-          states,
-          total_count,
-          total_pages: Math.ceil(total_count / size),
-        },
-        res,
-      };
 
-      return returnSuccess(returnObj);
+      res_obj.message = message;
+      res_obj.payload = {
+        states,
+        total_count,
+        total_pages: Math.ceil(total_count / size),
+      };
+      log_obj.database = false;
+
+      logInfo(req, message, req.decoded.id, log_obj);
+
+      returnSuccess(res_obj);
     }
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    const returnObj = {
-      message: message,
-      payload: {},
-      res,
-    };
-    return returnError(returnObj);
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
+
+    returnError(res_obj);
   }
 };
 
 const deleteState = async (req, res, next) => {
+  var log_obj = {
+    action: "delete_state",
+    module: "preferences",
+    sub_module: "state",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
   try {
     const state = await req.State.destroy();
     const message = "State deleted successfully.";
-    const returnObj = {
-      res,
-      message,
-      payload: {
-        State: state.id,
-      },
+
+    res_obj.message = message;
+    res_obj.payload = {
+      State: state.id,
     };
-    return returnSuccess(returnObj);
+
+    log_obj.payload = JSON.stringify(state);
+    logInfo(req, message, req.decoded.id, log_obj);
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    const returnObj = {
-      res,
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
 
-      message: message,
-      payload: {},
-    };
-    return returnError(returnObj);
+    return returnError(res_obj);
   }
 };
 
 const updateState = async (req, res, next) => {
+  var log_obj = {
+    action: "update_state",
+    module: "preferences",
+    sub_module: "state",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
   try {
     const { name } = req.body;
 
@@ -147,24 +177,23 @@ const updateState = async (req, res, next) => {
     sys_state.set({
       name,
     });
-    await sys_state.save();
+    const updated_state = await sys_state.save();
 
     const message = "State updated successfully";
-    logInfo(req, message, req.decoded.id);
 
-    return returnSuccess({
-      message,
-      payload: {},
-      res,
+    res_obj.message = message;
+    log_obj.payload = JSON.stringify({
+      from: sys_state,
+      to: updated_state,
     });
+    logInfo(req, message, req.decoded.id, log_obj);
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    return returnError({
-      message: message,
-      payload: {},
-      res,
-    });
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
+    returnError(res_obj);
   }
 };
 

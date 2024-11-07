@@ -1,8 +1,24 @@
 const { Role, User, Permission } = require("../models");
 
-const { logInfo, logError,returnError,returnSuccess } = require("./../utils/helper");
+const {
+  logInfo,
+  logError,
+  returnError,
+  returnSuccess,
+} = require("./../utils/helper");
+const { NODE_ENV } = process.env;
 
 const createRoles = async (req, res, next) => {
+  var log_obj = {
+    action: "create_role",
+    module: "preferences",
+    sub_module: "role",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
   try {
     const { name, permissions } = req.body;
     const default_req = req.body.default;
@@ -10,32 +26,42 @@ const createRoles = async (req, res, next) => {
     await role.setPermissions(permissions);
 
     const message = " Role created Successfully";
-    logInfo(req, message, req.decoded.id);
-
-    return returnSuccess({
-      status: "success",
-      message,
-      payload: {},
-      res
-    });
+    res_obj.message = message;
+    log_obj.payload = JSON.stringify(role);
+    log_obj.description = JSON.stringify({ permissions });
+    logInfo(req, message, req.decoded.id, log_obj);
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    return returnError({
-      status: "error",
-      message: message,
-      payload: {},
-      res
-    });
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
+    returnError(res_obj);
   }
 };
 const updateRoles = async (req, res, next) => {
+  var log_obj = {
+    action: "update_role",
+    module: "preferences",
+    sub_module: "role",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
   try {
     const { name, permissions } = req.body;
     const default_req = req.body.default;
     const role = req.params.id;
     const sys_role = await Role.findOne({
       where: { id: role },
+      include: [
+        {
+          model: Permission,
+          as: "permissions",
+        },
+      ],
     });
 
     if (sys_role) {
@@ -43,41 +69,47 @@ const updateRoles = async (req, res, next) => {
         name,
         default: default_req,
       });
-      await sys_role.save();
+      var updated_role = await sys_role.save();
       await sys_role.setPermissions([]);
       await sys_role.setPermissions(permissions);
     } else {
       const message = "Invalid role selection.";
-      logError(req, message, req.decoded.id);
-      return returnError({
-        status: "error",
-        message: message,
-        payload: {},
-        res
-      });
+      res_obj.message = message;
+      log_obj.database = false;
+      logError(req, message, req.decoded.id, log_obj);
+      returnError(res_obj);
     }
 
     const message = "Role updated Successfully";
-    logInfo(req, message, req.decoded.id);
+    res_obj.message = message;
 
-    return returnSuccess({
-      status: "success",
-      message,
-      payload: {},
-      res
+    log_obj.payload = JSON.stringify({
+      from: sys_role,
+      to: updated_role,
     });
+    log_obj.description = JSON.stringify({ permissions });
+    logInfo(req, message, req.decoded.id, log_obj);
+
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    return returnError({
-      status: "error",
-      message: message,
-      payload: {},
-      res
-    });
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
+    returnError(res_obj);
   }
 };
 const updateRolesUsers = async (req, res, next) => {
+  var log_obj = {
+    action: "assign_user",
+    module: "preferences",
+    sub_module: "role",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
   try {
     const { users } = req.body;
 
@@ -92,36 +124,36 @@ const updateRolesUsers = async (req, res, next) => {
       await sys_role.setUsers(users);
     } else {
       const message = "Invalid role selection.";
-      logError(req, message, req.decoded.id);
-      return returnError({
-        status: "error",
-        message: message,
-        payload: {},
-        res
-      });
+      res_obj.message = message;
+      log_obj.database = false;
+      logError(req, message, req.decoded.id, log_obj);
+      returnError(res_obj);
     }
 
-    const message = " Users assigned Successfully";
-    logInfo(req, message, req.decoded.id);
-
-    return returnSuccess({
-      status: "success",
-      message,
-      payload: {},
-      res
-    });
+    const message = "Users assigned Successfully";
+    res_obj.message = message;
+    log_obj.database = false;
+    logInfo(req, message, req.decoded.id, log_obj);
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
     logError(req, message, req.decoded.id);
-    return returnError({
-      status: "error",
-      message: message,
-      payload: {},
-      res
-    });
+    returnError(res_obj);
   }
 };
 const removeRolesUsers = async (req, res, next) => {
+  var log_obj = {
+    action: "remove_user",
+    module: "preferences",
+    sub_module: "role",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
   try {
     const { user } = req.body;
 
@@ -135,37 +167,38 @@ const removeRolesUsers = async (req, res, next) => {
       await sys_role.removeUser(user);
     } else {
       const message = "Invalid role selection.";
-      logError(req, message, req.decoded.id);
-      return returnError({
-        status: "error",
-        message: message,
-        payload: {},
-        res
-      });
+      res_obj.message = message;
+      log_obj.database = false;
+      logError(req, message, req.decoded.id, log_obj);
+      return returnError(res_obj);
     }
 
     const message = " User remove successfully";
-    logInfo(req, message, req.decoded.id);
+    res_obj.message = message;
+    log_obj.database = false;
+    logInfo(req, message, req.decoded.id, log_obj);
 
-    return returnSuccess({
-      status: "success",
-      message,
-      payload: {},
-      res
-    });
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    return returnError({
-      status: "error",
-      message: message,
-      payload: {},
-      res
-    });
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
+    return returnError(res_obj);
   }
 };
 
 const getAllRoles = async (req, res, next) => {
+  var log_obj = {
+    action: "get_role",
+    module: "preferences",
+    sub_module: "role",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
   try {
     const allroles = req.query.all;
 
@@ -192,16 +225,13 @@ const getAllRoles = async (req, res, next) => {
       });
 
       const message = " Roles fetched successfully";
-      logInfo(req, message, req.decoded.id);
-
-      return returnSuccess({
-        status: "success",
-        message,
-        payload: {
-          roles,
-        },
-        res
-      });
+      res_obj.message = message;
+      res_obj.payload = {
+        roles,
+      };
+      log_obj.database = false;
+      logInfo(req, message, req.decoded.id, log_obj);
+      returnSuccess(res_obj);
     } else {
       const pageAsNumber = Number.parseInt(req.query.page);
       const sizeAsNumber = Number.parseInt(req.query.size);
@@ -214,7 +244,7 @@ const getAllRoles = async (req, res, next) => {
       let size = 10;
       if (
         !Number.isNaN(sizeAsNumber) &&
-        !(sizeAsNumber > 10) &&
+        sizeAsNumber > 10 &&
         !(sizeAsNumber < 1)
       ) {
         size = sizeAsNumber;
@@ -250,32 +280,37 @@ const getAllRoles = async (req, res, next) => {
       });
       const total_count = await Role.count();
       const message = " Roles fetched create Successfully";
-      logInfo(req, message, req.decoded.id);
 
-      return returnSuccess({
-        status: "success",
-        message,
-        payload: {
-          roles,
-          total_count,
-          total_pages: Math.ceil(total_count / size),
-        },
-        res
-      });
+      res_obj.message = message;
+      res_obj.payload = {
+        roles,
+        total_count,
+        total_pages: Math.ceil(total_count / size),
+      };
+      log_obj.database = false;
+      logInfo(req, message, req.decoded.id, log_obj);
+
+      return returnSuccess(res_obj);
     }
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    return returnError({
-      status: "error",
-      message: message,
-      payload: {},
-      res
-    });
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    returnError(res_obj);
   }
 };
 
 const deleteRole = async (req, res, next) => {
+  var log_obj = {
+    action: "delete_role",
+    module: "preferences",
+    sub_module: "role",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
   try {
     const role = req.params.id;
     const sys_role = await Role.findOne({
@@ -290,34 +325,26 @@ const deleteRole = async (req, res, next) => {
     });
     if (sys_role.dataValues.users.length) {
       const message = "Cannot delete role with users associated with it.";
-      logError(req, message, req.decoded.id);
-      return returnError({
-        status: "error",
-        message: message,
-        payload: {},
-        res
-      });
+      res_obj.message = message;
+      log_obj.database = false;
+      logError(req, message, req.decoded.id, log_obj);
+      returnError(res_obj);
     } else {
-      await sys_role.destroy();
+      const deleted_role = await sys_role.destroy();
       const message = "Role deleted successfully.";
-      return returnSuccess({
-        status: "success",
-        message,
-        payload: {
-          role,
-        },
-        res
-      });
+      res_obj.message = message;
+      res_obj.payload = {
+        role,
+      };
+      res_obj.payload = JSON.stringify(deleted_role);
+      returnSuccess(res_obj);
     }
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    return returnError({
-      status: "error",
-      message: message,
-      payload: {},
-      res
-    });
+    logError(req, message, req.decoded.id, log_obj);
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    returnError(res_obj);
   }
 };
 

@@ -15,8 +15,16 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "user_id",
       });
       this.hasMany(models.AuditLog, {
-        as: "auditlogs",
-        foreignKey: "user_id",
+        as: "auditlogs_from",
+        foreignKey: "to_id",
+      });
+      this.hasMany(models.AuditLog, {
+        as: "auditlogs_to",
+        foreignKey: "to_id",
+      });
+      this.hasOne(models.Department, {
+        as: "headOfDepartment",
+        foreignKey: "hod",
       });
 
       this.belongsTo(models.Department, {
@@ -27,6 +35,19 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Gender, {
         foreignKey: "gender_id",
         as: "gender",
+      });
+      this.belongsTo(models.Designation, {
+        foreignKey: "designation_id",
+        as: "designation",
+      });
+
+      this.belongsTo(models.EmployeeCategory, {
+        foreignKey: "employeecategory_id",
+        as: "employeecategory",
+      });
+      this.belongsTo(models.EmployeeStatus, {
+        foreignKey: "employeestatus_id",
+        as: "employeestatus",
       });
 
       this.belongsTo(models.Country, {
@@ -47,6 +68,7 @@ module.exports = (sequelize, DataTypes) => {
         through: "branchmanagers",
         as: "manager_branches",
         foreignKey: "user_id",
+        onDelete: "cascade",
       });
     }
   }
@@ -61,6 +83,9 @@ module.exports = (sequelize, DataTypes) => {
       branch_id: DataTypes.INTEGER,
       state_id: DataTypes.INTEGER,
       country_id: DataTypes.INTEGER,
+      employeecategory_id: DataTypes.INTEGER,
+      employeestatus_id: DataTypes.INTEGER,
+      designation_id: DataTypes.INTEGER,
     },
     {
       sequelize,

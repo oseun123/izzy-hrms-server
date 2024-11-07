@@ -5,34 +5,44 @@ const {
   returnSuccess,
   returnError,
 } = require("./../utils/helper");
+const { NODE_ENV } = process.env;
 
 const createCompany = async (req, res, next) => {
+  var log_obj = {
+    action: "create_company",
+    module: "preferences",
+    sub_module: "company",
+    payload: null,
+    description: null,
+    database: true,
+  };
+  var res_obj = { res, message: "", payload: {} };
   try {
     const { name } = req.body;
-    await Company.create({ name });
-
+    const new_company = await Company.create({ name });
     const message = "Company created successfully";
-    const returnObj = {
-      message,
-      payload: {},
-      res,
-    };
-    logInfo(req, message, req.decoded.id);
-    return returnSuccess(returnObj);
+    res_obj.message = message;
+    log_obj.payload = JSON.stringify(new_company);
+    logInfo(req, message, req.decoded.id, log_obj);
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    const returnObj = {
-      message,
-      payload: {},
-      res,
-    };
-    logError(req, message, req.decoded.id);
-
-    return returnError(returnObj);
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
+    returnError(res_obj);
   }
 };
 
 const getAllCompanies = async (req, res, next) => {
+  var log_obj = {
+    action: "get_company",
+    module: "preferences",
+    sub_module: "company",
+    payload: null,
+    description: null,
+  };
+  var res_obj = { res, message: "", payload: {} };
   try {
     const allcompanys = req.query.all;
 
@@ -47,15 +57,11 @@ const getAllCompanies = async (req, res, next) => {
       });
 
       const message = " Company fetched successfully";
-      logInfo(req, message, req.decoded.id);
-      const returnObj = {
-        message,
-        payload: {
-          companys,
-        },
-        res,
-      };
-      return returnSuccess(returnObj);
+      res_obj.message = message;
+      res_obj.payload = { companys };
+
+      logInfo(req, message, req.decoded.id, log_obj);
+      returnSuccess(res_obj);
     } else {
       const pageAsNumber = Number.parseInt(req.query.page);
       const sizeAsNumber = Number.parseInt(req.query.size);
@@ -68,7 +74,7 @@ const getAllCompanies = async (req, res, next) => {
       let size = 10;
       if (
         !Number.isNaN(sizeAsNumber) &&
-        !(sizeAsNumber > 10) &&
+        sizeAsNumber > 10 &&
         !(sizeAsNumber < 1)
       ) {
         size = sizeAsNumber;
@@ -86,83 +92,91 @@ const getAllCompanies = async (req, res, next) => {
         offset: page * size,
       });
 
-      console.log(companys);
       const total_count = await Company.count();
-      const message = " Company fetched successfully";
-      logInfo(req, message, req.decoded.id);
-      const returnObj = {
-        message,
-        payload: {
-          companys,
-          total_count,
-          total_pages: Math.ceil(total_count / size),
-        },
-        res,
+      const message = "Company fetched successfully";
+      log_obj.database = false;
+      logInfo(req, message, req.decoded.id, log_obj);
+      res_obj.message = message;
+      res_obj.payload = {
+        companys,
+        total_count,
+        total_pages: Math.ceil(total_count / size),
       };
 
-      return returnSuccess(returnObj);
+      return returnSuccess(res_obj);
     }
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    const returnObj = {
-      message: message,
-      payload: {},
-      res,
-    };
-    return returnError(returnObj);
+    logError(req, message, req.decoded.id, log_obj);
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+
+    return returnError(res_obj);
   }
 };
 
 const deleteCompany = async (req, res, next) => {
+  var log_obj = {
+    action: "delete_company",
+    module: "preferences",
+    sub_module: "company",
+    payload: null,
+    description: null,
+    database: true,
+  };
+  var res_obj = { res, message: "", payload: {} };
+
   try {
     const company = await req.sys_company.destroy();
     const message = "Company deleted successfully.";
-    const returnObj = {
-      res,
-      message,
-      payload: {
-        company: company.id,
-      },
+    res_obj.message = message;
+    res_obj.payload = {
+      company: company.id,
     };
-    return returnSuccess(returnObj);
+    log_obj.payload = JSON.stringify(company);
+    logInfo(req, message, req.decoded.id, log_obj);
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    const returnObj = {
-      res,
-      message: message,
-      payload: {},
-    };
-    return returnError(returnObj);
+    logError(req, message, req.decoded.id, log_obj);
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    returnError(res_obj);
   }
 };
 
 const updateCompany = async (req, res, next) => {
+  var log_obj = {
+    action: "update_company",
+    module: "preferences",
+    sub_module: "company",
+    payload: null,
+    description: null,
+    database: true,
+  };
+  var res_obj = { res, message: "", payload: {} };
   try {
     const { name } = req.body;
     const sys_company = req.sys_company;
     sys_company.set({
       name,
     });
-    await sys_company.save();
+    const updated_company = await sys_company.save();
 
     const message = "Company updated successfully";
-    logInfo(req, message, req.decoded.id);
-
-    return returnSuccess({
-      message,
-      payload: {},
-      res,
+    log_obj.payload = JSON.stringify({
+      from: sys_company,
+      to: updated_company,
     });
+    logInfo(req, message, req.decoded.id, log_obj);
+    res_obj.message = message;
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
-    logError(req, message, req.decoded.id);
-    return returnError({
-      message: message,
-      payload: {},
-      res,
-    });
+    logError(req, message, req.decoded.id, log_obj);
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    return returnError(res_obj);
   }
 };
 

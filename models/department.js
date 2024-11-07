@@ -13,11 +13,17 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "department_id",
         as: "users",
       });
+
+      this.belongsTo(models.User, {
+        foreignKey: "hod", // This references the user_id in the User model
+        as: "headOfDepartment",
+      });
     }
   }
   Department.init(
     {
       name: DataTypes.STRING,
+      hod: DataTypes.INTEGER,
     },
     {
       sequelize,
