@@ -11,6 +11,7 @@ const companyController = require("../controllers/companyController");
 const branchController = require("../controllers/branchController");
 const designationController = require("../controllers/designationController");
 const employeeCategoryController = require("../controllers/employeeCategoryController");
+const employeeStatusController = require("../controllers/employeeStatusController");
 
 // middidleware
 const {
@@ -39,6 +40,12 @@ const {
   validateDeleteEmployeeCategory,
   validateUpdateEmployeeCategory,
 } = require("../middleware/preferences/employeeCategory");
+
+const {
+  validateEmployeeStatus,
+  validateDeleteEmployeeStatus,
+  validateUpdateEmployeeStatus,
+} = require("../middleware/preferences/employeeStatus");
 
 const {
   validateState,
@@ -378,29 +385,29 @@ router.put(
 router.post(
   "/employee-status",
   authorizeMiddleware,
-  validateEmployeeCategory,
+  validateEmployeeStatus,
   hasPermission("CREATE_EMPLOYEE_STATUS"),
-  employeeCategoryController.createEmployeeCategory
+  employeeStatusController.createEmployeeStatus
 );
 router.get(
   "/employee-statuses",
   authorizeMiddleware,
   hasPermission("VIEW_EMPLOYEE_STATUS"),
-  employeeCategoryController.getAllEmployeeCategories
+  employeeStatusController.getAllEmployeeStatuses
 );
 router.delete(
   "/employee-status/:id",
   authorizeMiddleware,
-  validateDeleteEmployeeCategory,
+  validateDeleteEmployeeStatus,
   hasPermission("DELETE_EMPLOYEE_STATUS"),
-  employeeCategoryController.deleteEmployeeCategory
+  employeeStatusController.deleteEmployeeStatus
 );
 router.put(
   "/employee-status/:id",
   authorizeMiddleware,
-  validateUpdateEmployeeCategory,
+  validateUpdateEmployeeStatus,
   hasPermission("EDIT_EMPLOYEE_STATUS"),
-  employeeCategoryController.updateEmployeeCategory
+  employeeStatusController.updateEmployeeStatus
 );
 // // employee status
 
