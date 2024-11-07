@@ -373,4 +373,35 @@ router.put(
 );
 // // employee category
 
+// employee status
+
+router.post(
+  "/employee-status",
+  authorizeMiddleware,
+  validateEmployeeCategory,
+  hasPermission("CREATE_EMPLOYEE_STATUS"),
+  employeeCategoryController.createEmployeeCategory
+);
+router.get(
+  "/employee-statuses",
+  authorizeMiddleware,
+  hasPermission("VIEW_EMPLOYEE_STATUS"),
+  employeeCategoryController.getAllEmployeeCategories
+);
+router.delete(
+  "/employee-status/:id",
+  authorizeMiddleware,
+  validateDeleteEmployeeCategory,
+  hasPermission("DELETE_EMPLOYEE_STATUS"),
+  employeeCategoryController.deleteEmployeeCategory
+);
+router.put(
+  "/employee-status/:id",
+  authorizeMiddleware,
+  validateUpdateEmployeeCategory,
+  hasPermission("EDIT_EMPLOYEE_STATUS"),
+  employeeCategoryController.updateEmployeeCategory
+);
+// // employee status
+
 module.exports = router;
