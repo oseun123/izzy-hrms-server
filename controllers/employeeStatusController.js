@@ -23,7 +23,7 @@ const createEmployeeStatus = async (req, res, next) => {
   var res_obj = { res, message: "", payload: {} };
   try {
     const { name } = req.body;
-    console.log({ name, EmployeeStatus });
+    // console.log({ name, EmployeeStatus });
     const new_employeeStatus = await EmployeeStatus.create({ name });
     const message = "Employee status created successfully";
     res_obj.message = message;
