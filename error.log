@@ -100,3 +100,5 @@
 {"level":"error","message":"Cannot read properties of undefined (reading 'findOne')--{\"clientAddress\":\"::1\"}--{\"userAgent\":\"PostmanRuntime/7.42.0\"}--{\"user_id\":1}--{}","timestamp":"2024-11-06T09:47:12.041Z"}
 {"level":"error","message":"Cannot read properties of undefined (reading 'findOne')--{\"clientAddress\":\"::1\"}--{\"userAgent\":\"PostmanRuntime/7.42.0\"}--{\"user_id\":1}--{}","timestamp":"2024-11-06T09:50:14.051Z"}
 {"level":"error","message":"Empolyee Category already exist.--{\"clientAddress\":\"::1\"}--{\"userAgent\":\"PostmanRuntime/7.42.0\"}--{\"user_id\":1}--{}","timestamp":"2024-11-06T09:54:33.870Z"}
+{"level":"error","message":"Not authorized to perform this action.--{\"clientAddress\":\"::1\"}--{\"userAgent\":\"PostmanRuntime/7.42.0\"}--{\"user_id\":1}--{}","timestamp":"2024-11-07T08:29:36.962Z"}
+{"level":"error","message":"Namess is required--{\"clientAddress\":\"::1\"}--{\"userAgent\":\"PostmanRuntime/7.42.0\"}--{\"user_id\":1}--{}","timestamp":"2024-11-07T08:36:23.519Z"}
