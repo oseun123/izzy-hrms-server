@@ -12,6 +12,7 @@ const branchController = require("../controllers/branchController");
 const designationController = require("../controllers/designationController");
 const employeeCategoryController = require("../controllers/employeeCategoryController");
 const employeeStatusController = require("../controllers/employeeStatusController");
+const generalSettingsController = require("../controllers/preferences/generalSettingsController");
 
 // middidleware
 const {
@@ -69,6 +70,9 @@ const {
   validateDeleteBranch,
   validateUpdateBranch,
 } = require("../middleware/preferences/branch");
+const {
+  validateEmployeeNumberPrefix,
+} = require("../middleware/preferences/employeeNumber");
 
 const { authorizeMiddleware } = require("../middleware/authorize");
 
@@ -410,5 +414,28 @@ router.put(
   employeeStatusController.updateEmployeeStatus
 );
 // // employee status
+
+// general settings
+router.get(
+  "/settings-general-employee-number",
+  authorizeMiddleware,
+  hasPermission("SET_GENERAL"),
+  generalSettingsController.getEmployeeNumberFormat
+);
+router.put(
+  "/settings-general-prefix",
+  authorizeMiddleware,
+  validateEmployeeNumberPrefix,
+  hasPermission("SET_GENERAL"),
+  generalSettingsController.editEmployeeNumberPrefix
+);
+router.put(
+  "/settings-general-suffix",
+  authorizeMiddleware,
+  hasPermission("SET_GENERAL"),
+  generalSettingsController.editEmployeeNumberSuffix
+);
+
+// end general settings
 
 module.exports = router;

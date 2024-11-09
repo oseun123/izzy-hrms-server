@@ -328,6 +328,7 @@ module.exports = {
         created_at: new Date(),
         updated_at: new Date(),
       },
+
       {
         name: "Create Employee",
         for: "Human Resource",
@@ -456,6 +457,16 @@ module.exports = {
         module: "Employee Status",
         url: "",
         action: "DELETE_EMPLOYEE_STATUS",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "General",
+        for: "Preferences",
+        menu: 1,
+        module: "Settings",
+        url: "/preferences/general-settings",
+        action: "SET_GENERAL",
         created_at: new Date(),
         updated_at: new Date(),
       },
