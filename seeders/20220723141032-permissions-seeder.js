@@ -464,7 +464,7 @@ module.exports = {
         name: "General",
         for: "Preferences",
         menu: 1,
-        module: "General",
+        module: "Settings",
         url: "/preferences/general-settings",
         action: "SET_GENERAL",
         created_at: new Date(),
