@@ -53,13 +53,13 @@ module.exports = {
       },
     });
 
-    await queryInterface.addIndex("auditlogs", [
-      "action",
-      "module",
-      "sub_module",
-      "description",
-      "level",
-    ]);
+    // await queryInterface.addIndex("auditlogs", [
+    //   "action",
+    //   "module",
+    //   "sub_module",
+    //   "description",
+    //   "level",
+    // ]);
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable("auditlogs");
