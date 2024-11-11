@@ -421,7 +421,7 @@ module.exports = {
       },
 
       {
-        name: "Create Employee Category",
+        name: "Create Employee Status",
         for: "Preferences",
         menu: 1,
         module: "Employee Status",
