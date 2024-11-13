@@ -90,7 +90,7 @@ router.get(
   preferencesController.userPermissions
 );
 // users
-router.get("/users", authorizeMiddleware, usersController.allUsers);
+router.get("/users", authorizeMiddleware, usersController.systemUsers);
 
 // roles
 router.post(
