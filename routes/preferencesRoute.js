@@ -72,6 +72,7 @@ const {
 } = require("../middleware/preferences/branch");
 const {
   validateEmployeeNumberPrefix,
+  validateEmployeeNumberStatus,
 } = require("../middleware/preferences/employeeNumber");
 
 const { authorizeMiddleware } = require("../middleware/authorize");
@@ -434,6 +435,13 @@ router.put(
   authorizeMiddleware,
   hasPermission("SET_GENERAL"),
   generalSettingsController.editEmployeeNumberSuffix
+);
+
+router.put(
+  "/settings-general-status",
+  authorizeMiddleware,
+  hasPermission("SET_GENERAL"),
+  generalSettingsController.editEmployeeNumberStatus
 );
 
 // end general settings
