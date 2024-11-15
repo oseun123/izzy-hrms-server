@@ -182,9 +182,68 @@ async function getNextEmployeeNumber(req, res, next) {
   }
 }
 
+async function editEmployeeNumberStatus(req, res, next) {
+  var log_obj = {
+    action: "edit_employee_number_status",
+    module: "preferences",
+    sub_module: "Settings",
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  var res_obj = { res, message: "", payload: {} };
+
+  try {
+    const { status } = req.body;
+
+    const n_status = toBinary(status);
+    const format = await EmployeeNumber.findByPk(1);
+    format.set({
+      status: n_status,
+    });
+    updated_format = await format.save();
+
+    const message = "Status updated successfully";
+    res_obj.message = message;
+
+    res_obj.payload = {
+      format: updated_format,
+      format_string: `${updated_format.prefix}-${updated_format.sequence}${
+        updated_format.suffix ? `-${updated_format.suffix}` : ""
+      }`,
+    };
+    log_obj.payload = JSON.stringify({
+      from: format,
+      to: updated_format,
+    });
+
+    logInfo(req, message, req.decoded.id, log_obj);
+
+    returnSuccess(res_obj);
+  } catch (error) {
+    const message = error.message;
+    res_obj.message =
+      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+    logError(req, message, req.decoded.id, log_obj);
+    returnError(res_obj);
+  }
+}
+
+function toBinary(value) {
+  return value === "0" ||
+    value === 0 ||
+    value === "false" ||
+    value === false ||
+    value == null
+    ? 0
+    : 1;
+}
+
 module.exports = {
   getEmployeeNumberFormat,
   editEmployeeNumberPrefix,
   editEmployeeNumberSuffix,
   getNextEmployeeNumber,
+  editEmployeeNumberStatus,
 };
