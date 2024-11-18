@@ -6,18 +6,18 @@ module.exports = {
       "clients",
       [
         {
-          name: "admin",
+          name: "Izzy",
           settings: JSON.stringify([
             {
               name: "Izzy",
               display: {
                 navbar_variant: {
-                  nav_variant_bg: "navbar-dark",
-                  nav_variant: "navbar-gray",
+                  nav_variant_bg: "navbar-light",
+                  nav_variant: "navbar-light",
                 },
                 dark_side_bar_variant: "sidebar-dark-orange ",
-                sidebar_variant: "sidebar-light-warning",
-                brand_variant: "navbar-white",
+                sidebar_variant: "sidebar-light-primary",
+                brand_variant: "navbar-light",
               },
             },
           ]),

@@ -54,55 +54,63 @@ exports.signIn = async (req, res, next) => {
       },
     });
 
-    //  get last login
-    var user_last_log = await AuditLog.findOne({
-      where: { user_id: user.id, action: "login", level: "success" },
-      order: [["id", "DESC"]],
-    });
-
-    if (user && comparePassword(password, user.password)) {
-      const token = createToken({
-        ...user.dataValues,
-        last_login: user_last_log?.dataValues?.created_at,
-      });
-      const refreshToken = createRefreshToken(user);
-      await UserSession.create({
-        user_id: user.id,
-        refresh_token: refreshToken,
+    if (user) {
+      //  get last login
+      var user_last_log = await AuditLog.findOne({
+        where: { user_id: user.id, action: "login", level: "success" },
+        order: [["id", "DESC"]],
       });
 
-      res.cookie(APP_JWT_COOKIE, refreshToken, {
-        // domain: "localhost",
-        httpOnly: true,
-        sameSite: "None",
-        secure: true,
-        maxAge: 24 * 60 * 60 * 1000,
-      });
+      if (user && comparePassword(password, user.password)) {
+        const token = createToken({
+          ...user.dataValues,
+          last_login: user_last_log?.dataValues?.created_at,
+        });
+        const refreshToken = createRefreshToken(user);
+        await UserSession.create({
+          user_id: user.id,
+          refresh_token: refreshToken,
+        });
 
-      const permissions = getUserPermissions(user);
+        res.cookie(APP_JWT_COOKIE, refreshToken, {
+          // domain: "localhost",
+          httpOnly: true,
+          sameSite: "None",
+          secure: true,
+          maxAge: 24 * 60 * 60 * 1000,
+        });
 
-      const message = "Sign in successfully";
+        const permissions = getUserPermissions(user);
 
-      logInfo(req, message, user.id, log_obj);
+        const message = "Sign in successfully";
 
-      const payload = {
-        user: {
-          id: user.id,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          permissions,
-        },
-        token,
-      };
+        logInfo(req, message, user.id, log_obj);
 
-      res_obj.message = message;
+        const payload = {
+          user: {
+            id: user.id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            permissions,
+          },
+          token,
+        };
 
-      res_obj.payload = payload;
+        res_obj.message = message;
 
-      returnSuccess(res_obj);
+        res_obj.payload = payload;
+
+        returnSuccess(res_obj);
+      } else {
+        const message = "Invalid email/password combination";
+        logError(req, message, user.id, log_obj);
+        res_obj.message = message;
+
+        returnError(res_obj);
+      }
     } else {
       const message = "Invalid email/password combination";
-      logError(req, message, user.id, log_obj);
+      // logError(req, message, "NAN", log_obj);
       res_obj.message = message;
 
       returnError(res_obj);
