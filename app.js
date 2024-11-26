@@ -1,9 +1,7 @@
 const express = require("express");
 const corsOptions = require("./config/corsOptions");
 const credentials = require("./middleware/credentials");
-const authRoute = require("./routes/authRoute");
-const preferencesRoute = require("./routes/preferencesRoute");
-const utilRotue = require("./routes/utilRoute");
+const routes = require("./routes");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
@@ -34,9 +32,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-app.use("/api/auth/", authRoute);
-app.use("/api/preferences/", preferencesRoute);
-app.use("/api/utils/", utilRotue);
+app.use("/api", routes);
 
 // Error Handling
 app.use((req, res, next) => {

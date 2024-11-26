@@ -24,6 +24,7 @@
     "winston": "^3.4.0"
   },
   "devDependencies": {
+    "jsdoc": "^4.0.4",
     "sequelize-cli": "^6.6.2"
   }
 }

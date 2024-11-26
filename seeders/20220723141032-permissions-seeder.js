@@ -5,7 +5,7 @@ module.exports = {
     return await queryInterface.bulkInsert("permissions", [
       {
         name: "Personal Dashboard",
-        for: "Dashboard",
+        for: "Personal",
         menu: 1,
         module: "root",
         url: "/",
@@ -15,10 +15,10 @@ module.exports = {
       },
       {
         name: "Admin Dashboard",
-        for: "Dashboard",
+        for: "Personal",
         menu: 1,
         module: "root",
-        url: "/dashboard/admin",
+        url: "/personal/profile",
         action: "ADMIN_DASHBOARD",
         created_at: new Date(),
         updated_at: new Date(),
@@ -336,6 +336,16 @@ module.exports = {
         module: "Onboarding",
         url: "/human-resource/create-employee",
         action: "CREATE_EMPLOYEE",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "View Employee",
+        for: "Human Resource",
+        menu: 1,
+        module: "Onboarding",
+        url: "/human-resource/view-employee",
+        action: "VIEW_EMPLOYEE",
         created_at: new Date(),
         updated_at: new Date(),
       },
