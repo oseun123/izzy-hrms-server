@@ -13,6 +13,8 @@ const designationController = require("../controllers/designationController");
 const employeeCategoryController = require("../controllers/employeeCategoryController");
 const employeeStatusController = require("../controllers/employeeStatusController");
 const generalSettingsController = require("../controllers/preferences/generalSettingsController");
+const gradeController = require("../controllers/preferences/gradeController");
+const stepController = require("../controllers/preferences/stepController");
 
 // middidleware
 const {
@@ -74,6 +76,17 @@ const {
   validateEmployeeNumberPrefix,
   validateEmployeeNumberStatus,
 } = require("../middleware/preferences/employeeNumber");
+
+const {
+  validateGrade,
+  validateDeleteGrade,
+  validateUpdateGrade,
+} = require("../middleware/preferences/grades");
+const {
+  validateStep,
+  validateDeleteStep,
+  validateUpdateStep,
+} = require("../middleware/preferences/steps");
 
 const { authorizeMiddleware } = require("../middleware/authorize");
 
@@ -445,5 +458,67 @@ router.put(
 );
 
 // end general settings
+
+// grades
+
+router.post(
+  "/grades",
+  authorizeMiddleware,
+  validateGrade,
+  hasPermission("CREATE_GRADES"),
+  gradeController.createGrade
+);
+router.get(
+  "/grades",
+  authorizeMiddleware,
+  hasPermission("VIEW_GRADES"),
+  gradeController.getAllGrades
+);
+router.delete(
+  "/grades/:id",
+  authorizeMiddleware,
+  validateDeleteGrade,
+  hasPermission("DELETE_GRADES"),
+  gradeController.deleteGrade
+);
+router.put(
+  "/grades/:id",
+  authorizeMiddleware,
+  validateUpdateGrade,
+  hasPermission("EDIT_GRADES"),
+  gradeController.updateGrade
+);
+// end grades
+
+// steps
+
+router.post(
+  "/steps",
+  authorizeMiddleware,
+  validateStep,
+  hasPermission("CREATE_STEPS"),
+  stepController.createStep
+);
+router.get(
+  "/steps",
+  authorizeMiddleware,
+  hasPermission("VIEW_STEPS"),
+  stepController.getAllSteps
+);
+router.delete(
+  "/steps/:id",
+  authorizeMiddleware,
+  validateDeleteStep,
+  hasPermission("DELETE_STEPS"),
+  stepController.deleteStep
+);
+router.put(
+  "/steps/:id",
+  authorizeMiddleware,
+  validateUpdateStep,
+  hasPermission("EDIT_STEPS"),
+  stepController.updateStep
+);
+// end steps
 
 module.exports = router;

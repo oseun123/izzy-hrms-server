@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "gender_id",
         as: "gender",
       });
+
       this.belongsTo(models.Designation, {
         foreignKey: "designation_id",
         as: "designation",
@@ -70,6 +71,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "user_id",
         onDelete: "cascade",
       });
+      this.belongsTo(models.Grade, {
+        foreignKey: "grade_id",
+        as: "grade",
+      });
+      this.belongsTo(models.Step, {
+        foreignKey: "step_id",
+        as: "step",
+      });
     }
   }
   User.init(
@@ -80,6 +89,8 @@ module.exports = (sequelize, DataTypes) => {
       password: DataTypes.STRING,
       department_id: DataTypes.INTEGER,
       gender_id: DataTypes.INTEGER,
+      grade_id: DataTypes.INTEGER,
+      step_id: DataTypes.INTEGER,
       branch_id: DataTypes.INTEGER,
       state_id: DataTypes.INTEGER,
       country_id: DataTypes.INTEGER,

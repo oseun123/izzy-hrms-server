@@ -28,6 +28,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         references: { model: "genders", key: "id" },
       },
+      grade_id: {
+        type: Sequelize.INTEGER,
+        references: { model: "grades", key: "id" },
+      },
+      step_id: {
+        type: Sequelize.INTEGER,
+        references: { model: "steps", key: "id" },
+      },
       designation_id: {
         type: Sequelize.INTEGER,
         references: { model: "designations", key: "id" },
