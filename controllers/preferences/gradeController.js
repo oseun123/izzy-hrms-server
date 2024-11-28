@@ -2,18 +2,18 @@
  * @module GradeController
  * @description Controller for managing grade-related operations such as creating, retrieving, deleting, and updating grades.
  *
- * @requires ../models
- * @requires ../utils/helper
+ * @requires ../../models
+ * @requires ../../utils/helper
  * @requires process.env
  */
 
-const { Grade, User } = require("../models");
+const { Grade, User } = require("../../models");
 const {
   logInfo,
   logError,
   returnSuccess,
   returnError,
-} = require("./../utils/helper");
+} = require("./../../utils/helper");
 
 const { NODE_ENV } = process.env;
 
@@ -93,7 +93,7 @@ const getAllGrades = async (req, res, next) => {
         include: [
           {
             model: User,
-            as: "user",
+            as: "users",
             attributes: { exclude: ["password"] },
           },
         ],

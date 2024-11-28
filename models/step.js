@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "step",
+      modelName: "Step",
       tableName: "steps",
       createdAt: "created_at",
       updatedAt: "updated_at",
