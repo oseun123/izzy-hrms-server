@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "grade",
+      modelName: "Grade",
       tableName: "grades",
       createdAt: "created_at",
       updatedAt: "updated_at",
