@@ -59,7 +59,7 @@ const getAllGenders = async (req, res, next) => {
         include: [
           {
             model: User,
-            as: "user",
+            as: "users",
             attributes: { exclude: ["password"] },
           },
         ],
@@ -200,6 +200,9 @@ const updateGender = async (req, res, next) => {
     returnError(res_obj);
   }
 };
+
+
+
 
 module.exports = {
   createGender,

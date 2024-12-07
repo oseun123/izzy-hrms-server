@@ -70,7 +70,7 @@ const getAllDepartments = async (req, res, next) => {
           },
           {
             model: User,
-            as: "user",
+            as: "users",
             attributes: { exclude: ["password"] },
           },
         ],
@@ -193,10 +193,14 @@ const updateDepartment = async (req, res, next) => {
     const { hod } = req.body;
     const sys_department = req.sys_department;
 
-    sys_department.set({
-      name,
-      hod,
-    });
+    sys_department.set({ name });
+    if (hod) {
+      sys_department.set({ hod });
+    } else {
+      sys_department.set({ hod: null });
+    }
+
+  
     const updated_department = await sys_department.save();
 
     const message = " Department updated successfully";
