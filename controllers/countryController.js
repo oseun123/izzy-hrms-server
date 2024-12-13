@@ -1,27 +1,27 @@
-const { Country, User } = require("../models");
+const { Country, User } = require('../models');
 const {
   logInfo,
   logError,
   returnSuccess,
   returnError,
-} = require("./../utils/helper");
+} = require('./../utils/helper');
 const { NODE_ENV } = process.env;
 
 const createCountry = async (req, res, next) => {
   var log_obj = {
-    action: "create_country",
-    module: "preferences",
-    sub_module: "country",
+    action: 'create_country',
+    module: 'preferences',
+    sub_module: 'country',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const { name } = req.body;
     const country = await Country.create({ name });
-    const message = "Country created Successfully";
+    const message = 'Country created Successfully';
     res_obj.message = message;
     log_obj.payload = JSON.stringify(country);
     logInfo(req, message, req.decoded.id, log_obj);
@@ -30,36 +30,36 @@ const createCountry = async (req, res, next) => {
     const message = error.message;
     logError(req, message, req.decoded.id, log_obj);
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     returnError(res_obj);
   }
 };
 
 const getAllCountrys = async (req, res, next) => {
   var log_obj = {
-    action: "get_country",
-    module: "preferences",
-    sub_module: "country",
+    action: 'get_country',
+    module: 'preferences',
+    sub_module: 'country',
     payload: null,
     description: null,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const allCountrys = req.query.all;
 
-    if (allCountrys === "all") {
+    if (allCountrys === 'all') {
       const countrys = await Country.findAll({
         include: [
           {
             model: User,
-            as: "user",
-            attributes: { exclude: ["password"] },
+            as: 'users',
+            attributes: { exclude: ['password'] },
           },
         ],
       });
 
-      const message = " Country fetched successfully";
+      const message = ' Country fetched successfully';
 
       res_obj.message = message;
       res_obj.payload = { countrys };
@@ -88,8 +88,8 @@ const getAllCountrys = async (req, res, next) => {
         include: [
           {
             model: User,
-            as: "users",
-            attributes: { exclude: ["password"] },
+            as: 'users',
+            attributes: { exclude: ['password'] },
           },
         ],
         // group: "Country.id",
@@ -97,7 +97,7 @@ const getAllCountrys = async (req, res, next) => {
         offset: page * size,
       });
       const total_count = await Country.count();
-      const message = " Country fetched successfully";
+      const message = ' Country fetched successfully';
       res_obj.message = message;
       res_obj.payload = {
         countrys,
@@ -110,7 +110,7 @@ const getAllCountrys = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
 
     logError(req, message, req.decoded.id, log_obj);
     returnError(res_obj);
@@ -119,17 +119,17 @@ const getAllCountrys = async (req, res, next) => {
 
 const deleteCountry = async (req, res, next) => {
   var log_obj = {
-    action: "delete_country",
-    module: "preferences",
-    sub_module: "country",
+    action: 'delete_country',
+    module: 'preferences',
+    sub_module: 'country',
     payload: null,
     description: null,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const country = await req.Country.destroy();
-    const message = "Country deleted successfully.";
+    const message = 'Country deleted successfully.';
     res_obj.message = message;
     res_obj.payload = {
       country: country.id,
@@ -139,7 +139,7 @@ const deleteCountry = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
     return returnError(res_obj);
   }
@@ -147,15 +147,15 @@ const deleteCountry = async (req, res, next) => {
 
 const updateCountry = async (req, res, next) => {
   var log_obj = {
-    action: "update_country",
-    module: "preferences",
-    sub_module: "country",
+    action: 'update_country',
+    module: 'preferences',
+    sub_module: 'country',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const { name } = req.body;
     const sys_country = req.sys_country;
@@ -164,7 +164,7 @@ const updateCountry = async (req, res, next) => {
     });
     const updated_country = await sys_country.save();
 
-    const message = "Country updated successfully";
+    const message = 'Country updated successfully';
     res_obj.message = message;
     log_obj.payload = JSON.stringify({
       from: sys_country,
