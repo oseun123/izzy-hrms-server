@@ -1,7 +1,7 @@
-const validator = require("validator");
-const { Branch, User } = require("../../models");
-const { returnError, logError } = require("../../utils/helper");
-const { Op } = require("sequelize");
+const validator = require('validator');
+const { Branch, User } = require('../../models');
+const { returnError, logError } = require('../../utils/helper');
+const { Op } = require('sequelize');
 
 /**
  * Middleware to validate the branch creation or update request.
@@ -23,9 +23,9 @@ const { Op } = require("sequelize");
 async function validateBranch(req, res, next) {
   const { name, address, headquarters, branch_managers, company_id } = req.body;
 
-  if (name === "") {
+  if (name === '') {
     return returnError({
-      message: "Name is required",
+      message: 'Name is required',
       payload: {},
       res,
     });
@@ -35,14 +35,14 @@ async function validateBranch(req, res, next) {
         const is_name = await Branch.findOne({ where: { name } });
         if (is_name) {
           return returnError({
-            message: "Branch already exist.",
+            message: 'Branch already exist.',
             payload: {},
             res,
           });
         }
       } catch (error) {
         const returnObj = {
-          status: "error",
+          status: 'error',
           message: error.message,
           payload: {},
           res,
@@ -59,41 +59,19 @@ async function validateBranch(req, res, next) {
   ) {
     return returnError({
       res,
-      message: "Kindly select branch manager for this branch.",
+      message: 'Kindly select branch manager for this branch.',
       payload: {},
     });
   }
-  if (address === "") {
+  if (address === '') {
     return returnError({
-      message: "Address is required",
+      message: 'Address is required',
       payload: {},
       res,
     });
   }
 
-  if (headquarters && req.body.branch_id) {
-    try {
-      const headquarter_branch = await Branch.findOne({
-        where: {
-          [Op.and]: [{ company_id: company_id }, { headquarters: true }],
-        },
-      });
-
-      if (headquarter_branch) {
-        return returnError({
-          res,
-          message: "Headquarter branch role already exist for this company.",
-          payload: {},
-        });
-      }
-    } catch (error) {
-      return returnError({
-        res,
-        message: error.message,
-        payload: {},
-      });
-    }
-  } else if (headquarters) {
+  if (headquarters && !req.body.branch_id) {
     try {
       const headquarter_branch = await Branch.findOne({
         where: {
@@ -107,7 +85,7 @@ async function validateBranch(req, res, next) {
       if (headquarter_branch) {
         return returnError({
           res,
-          message: "Headquarter branch role already exist for this company.",
+          message: 'Headquarter branch role already exist for this company.',
           payload: {},
         });
       }
@@ -131,21 +109,21 @@ async function validateDeleteBranch(req, res, next) {
       include: [
         {
           model: User,
-          as: "users",
+          as: 'users',
         },
         {
           model: User,
-          as: "managers",
+          as: 'managers',
         },
       ],
     });
 
     if (sys_branch.dataValues.users.length) {
-      const message = "Cannot delete branch with users associated with it.";
+      const message = 'Cannot delete branch with users associated with it.';
       logError(req, message, req.decoded.id);
 
       const returnObj = {
-        status: "error",
+        status: 'error',
         message,
         payload: {},
         res,
@@ -153,11 +131,11 @@ async function validateDeleteBranch(req, res, next) {
       return returnError(returnObj);
     }
     if (sys_branch.dataValues.managers.length) {
-      const message = "Cannot delete branch with managers associated with it.";
+      const message = 'Cannot delete branch with managers associated with it.';
       logError(req, message, req.decoded.id);
 
       const returnObj = {
-        status: "error",
+        status: 'error',
         message,
         payload: {},
         res,
@@ -167,7 +145,7 @@ async function validateDeleteBranch(req, res, next) {
     req.sys_branch = sys_branch;
   } catch (error) {
     const returnObj = {
-      status: "error",
+      status: 'error',
       message: error.message,
       payload: {},
       res,
@@ -185,12 +163,13 @@ async function validateUpdateBranch(req, res, next) {
 
     if (sys_branch) {
       req.sys_branch = sys_branch;
+
       next();
     } else {
-      const message = "Invalid branch selection.";
+      const message = 'Invalid branch selection.';
       logError(req, message, req.decoded.id);
       return returnError({
-        status: "error",
+        status: 'error',
         message: message,
         payload: {},
         res,
@@ -198,7 +177,7 @@ async function validateUpdateBranch(req, res, next) {
     }
   } catch (error) {
     const returnObj = {
-      status: "error",
+      status: 'error',
       message: error.message,
       payload: {},
       res,

@@ -22,7 +22,7 @@ const { returnError, logError } = require("../../utils/helper");
  * @returns {void} Sends an error response if validation fails; otherwise, proceeds to the next middleware.
  */
 async function validateStep(req, res, next) {
-  const { name } = req.body;
+  const { name } =   req.body;
 
   if (name === "") {
     const message = "Name is required";
