@@ -1,28 +1,28 @@
-const { State, User } = require("../models");
+const { State, User } = require('../models');
 const {
   logInfo,
   logError,
   returnSuccess,
   returnError,
-} = require("./../utils/helper");
+} = require('./../utils/helper');
 
 const createState = async (req, res, next) => {
   var log_obj = {
-    action: "create_state",
-    module: "preferences",
-    sub_module: "state",
+    action: 'create_state',
+    module: 'preferences',
+    sub_module: 'state',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
 
   try {
     const { name } = req.body;
     const new_state = await State.create({ name });
 
-    const message = "State created Successfully";
+    const message = 'State created Successfully';
     res_obj.message = message;
     log_obj.payload = JSON.stringify(new_state);
 
@@ -39,30 +39,30 @@ const createState = async (req, res, next) => {
 
 const getAllStates = async (req, res, next) => {
   var log_obj = {
-    action: "get_state",
-    module: "preferences",
-    sub_module: "state",
+    action: 'get_state',
+    module: 'preferences',
+    sub_module: 'state',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const allStates = req.query.all;
 
-    if (allStates === "all") {
+    if (allStates === 'all') {
       const states = await State.findAll({
         include: [
           {
             model: User,
-            as: "user",
-            attributes: { exclude: ["password"] },
+            as: 'users',
+            attributes: { exclude: ['password'] },
           },
         ],
       });
 
-      const message = " State fetched successfully";
+      const message = ' State fetched successfully';
       res_obj.message = message;
       res_obj.payload = {
         states,
@@ -93,8 +93,8 @@ const getAllStates = async (req, res, next) => {
         include: [
           {
             model: User,
-            as: "users",
-            attributes: { exclude: ["password"] },
+            as: 'users',
+            attributes: { exclude: ['password'] },
           },
         ],
         // group: "State.id",
@@ -102,7 +102,7 @@ const getAllStates = async (req, res, next) => {
         offset: page * size,
       });
       const total_count = await State.count();
-      const message = " State fetched successfully";
+      const message = ' State fetched successfully';
 
       res_obj.message = message;
       res_obj.payload = {
@@ -119,7 +119,7 @@ const getAllStates = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
 
     returnError(res_obj);
@@ -128,18 +128,18 @@ const getAllStates = async (req, res, next) => {
 
 const deleteState = async (req, res, next) => {
   var log_obj = {
-    action: "delete_state",
-    module: "preferences",
-    sub_module: "state",
+    action: 'delete_state',
+    module: 'preferences',
+    sub_module: 'state',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const state = await req.State.destroy();
-    const message = "State deleted successfully.";
+    const message = 'State deleted successfully.';
 
     res_obj.message = message;
     res_obj.payload = {
@@ -152,7 +152,7 @@ const deleteState = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
 
     return returnError(res_obj);
@@ -161,15 +161,15 @@ const deleteState = async (req, res, next) => {
 
 const updateState = async (req, res, next) => {
   var log_obj = {
-    action: "update_state",
-    module: "preferences",
-    sub_module: "state",
+    action: 'update_state',
+    module: 'preferences',
+    sub_module: 'state',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const { name } = req.body;
 
@@ -179,7 +179,7 @@ const updateState = async (req, res, next) => {
     });
     const updated_state = await sys_state.save();
 
-    const message = "State updated successfully";
+    const message = 'State updated successfully';
 
     res_obj.message = message;
     log_obj.payload = JSON.stringify({
@@ -191,7 +191,7 @@ const updateState = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
     returnError(res_obj);
   }
