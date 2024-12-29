@@ -1,4 +1,4 @@
-const { EmployeeCategory, User } = require("../models");
+const { EmployeeCategory, User } = require('../models');
 // const designation = require("../models/designation");
 
 const {
@@ -6,25 +6,25 @@ const {
   logError,
   returnSuccess,
   returnError,
-} = require("./../utils/helper");
+} = require('./../utils/helper');
 
 const { NODE_ENV } = process.env;
 
 const createEmployeeCategory = async (req, res, next) => {
   var log_obj = {
-    action: "create_employee_category",
-    module: "preferences",
-    sub_module: "employee category",
+    action: 'create_employee_category',
+    module: 'preferences',
+    sub_module: 'employee category',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const { name } = req.body;
     const new_employeeCategory = await EmployeeCategory.create({ name });
-    const message = "Employee category created successfully";
+    const message = 'Employee category created successfully';
     res_obj.message = message;
     log_obj.payload = JSON.stringify(new_employeeCategory);
 
@@ -33,7 +33,7 @@ const createEmployeeCategory = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
 
     returnError(res_obj);
@@ -42,31 +42,31 @@ const createEmployeeCategory = async (req, res, next) => {
 
 const getAllEmployeeCategories = async (req, res, next) => {
   var log_obj = {
-    action: "get_employee_category",
-    module: "preferences",
-    sub_module: "employee category",
+    action: 'get_employee_category',
+    module: 'preferences',
+    sub_module: 'employee category',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
 
   try {
     const allemployeeCategory = req.query.all;
 
-    if (allemployeeCategory === "all") {
+    if (allemployeeCategory === 'all') {
       const employeeCategory = await EmployeeCategory.findAll({
         include: [
           {
             model: User,
-            as: "users",
-            attributes: { exclude: ["password"] },
+            as: 'users',
+            attributes: { exclude: ['password'] },
           },
         ],
       });
 
-      const message = " Employee category fetched successfully";
+      const message = ' Employee category fetched successfully';
       res_obj.message = message;
       res_obj.payload = {
         employeeCategory,
@@ -97,8 +97,8 @@ const getAllEmployeeCategories = async (req, res, next) => {
         include: [
           {
             model: User,
-            as: "users",
-            attributes: { exclude: ["password"] },
+            as: 'users',
+            attributes: { exclude: ['password'] },
           },
         ],
         // group: "Designation.id",
@@ -106,7 +106,7 @@ const getAllEmployeeCategories = async (req, res, next) => {
         offset: page * size,
       });
       const total_count = await EmployeeCategory.count();
-      const message = " Employee category fetched successfully";
+      const message = ' Employee category fetched successfully';
       res_obj.message = message;
       res_obj.payload = {
         employeeCategory,
@@ -121,7 +121,7 @@ const getAllEmployeeCategories = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
 
     returnError(res_obj);
@@ -130,19 +130,19 @@ const getAllEmployeeCategories = async (req, res, next) => {
 
 const deleteEmployeeCategory = async (req, res, next) => {
   var log_obj = {
-    action: "delete_employee_category",
-    module: "preferences",
-    sub_module: "employee category",
+    action: 'delete_employee_category',
+    module: 'preferences',
+    sub_module: 'employee category',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
 
   try {
     const employeeCategory = await req.employeeCategory.destroy();
-    const message = "Employee category deleted successfully.";
+    const message = 'Employee category deleted successfully.';
 
     res_obj.message = message;
 
@@ -158,7 +158,7 @@ const deleteEmployeeCategory = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
 
     returnError(res_obj);
@@ -167,15 +167,15 @@ const deleteEmployeeCategory = async (req, res, next) => {
 
 const updateEmployeeCategory = async (req, res, next) => {
   var log_obj = {
-    action: "update_employee_category",
-    module: "preferences",
-    sub_module: "employee category",
+    action: 'update_employee_category',
+    module: 'preferences',
+    sub_module: 'employee category',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const { name } = req.body;
     const sys_employeeCategory = req.sys_employeeCategory;
@@ -184,7 +184,7 @@ const updateEmployeeCategory = async (req, res, next) => {
     });
     const updated_sys_employeeCategory = await sys_employeeCategory.save();
 
-    const message = "Employee category updated successfully";
+    const message = 'Employee category updated successfully';
     res_obj.message = message;
     log_obj.payload = JSON.stringify({
       from: sys_employeeCategory,
@@ -196,7 +196,7 @@ const updateEmployeeCategory = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
     returnError(res_obj);
   }

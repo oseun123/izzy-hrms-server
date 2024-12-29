@@ -1,30 +1,30 @@
-const { Designation, User } = require("../models");
-const designation = require("../models/designation");
+const { Designation, User } = require('../models');
+const designation = require('../models/designation');
 
 const {
   logInfo,
   logError,
   returnSuccess,
   returnError,
-} = require("./../utils/helper");
+} = require('./../utils/helper');
 
 const { NODE_ENV } = process.env;
 
 const createDesignation = async (req, res, next) => {
   var log_obj = {
-    action: "create_designation",
-    module: "preferences",
-    sub_module: "designation",
+    action: 'create_designation',
+    module: 'preferences',
+    sub_module: 'designation',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const { name } = req.body;
     const new_designation = await Designation.create({ name });
-    const message = "Designation created Successfully";
+    const message = 'Designation created Successfully';
     res_obj.message = message;
     log_obj.payload = JSON.stringify(new_designation);
 
@@ -33,7 +33,7 @@ const createDesignation = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
 
     returnError(res_obj);
@@ -42,34 +42,34 @@ const createDesignation = async (req, res, next) => {
 
 const getAllDesignations = async (req, res, next) => {
   var log_obj = {
-    action: "get_designation",
-    module: "preferences",
-    sub_module: "designation",
+    action: 'get_designation',
+    module: 'preferences',
+    sub_module: 'designation',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
 
   try {
     const alldesignation = req.query.all;
 
-    if (alldesignation === "all") {
-      const designation = await Designation.findAll({
+    if (alldesignation === 'all') {
+      const designations = await Designation.findAll({
         include: [
           {
             model: User,
-            as: "users",
-            attributes: { exclude: ["password"] },
+            as: 'users',
+            attributes: { exclude: ['password'] },
           },
         ],
       });
 
-      const message = " Designation fetched successfully";
+      const message = ' Designation fetched successfully';
       res_obj.message = message;
       res_obj.payload = {
-        designation,
+        designations,
       };
       log_obj.database = false;
       logInfo(req, message, req.decoded.id, log_obj);
@@ -97,8 +97,8 @@ const getAllDesignations = async (req, res, next) => {
         include: [
           {
             model: User,
-            as: "users",
-            attributes: { exclude: ["password"] },
+            as: 'users',
+            attributes: { exclude: ['password'] },
           },
         ],
         // group: "Designation.id",
@@ -106,7 +106,7 @@ const getAllDesignations = async (req, res, next) => {
         offset: page * size,
       });
       const total_count = await Designation.count();
-      const message = " Designation fetched successfully";
+      const message = ' Designation fetched successfully';
       res_obj.message = message;
       res_obj.payload = {
         designations,
@@ -121,7 +121,7 @@ const getAllDesignations = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
 
     returnError(res_obj);
@@ -130,19 +130,19 @@ const getAllDesignations = async (req, res, next) => {
 
 const deleteDesignation = async (req, res, next) => {
   var log_obj = {
-    action: "delete_designation",
-    module: "preferences",
-    sub_module: "designation",
+    action: 'delete_designation',
+    module: 'preferences',
+    sub_module: 'designation',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
 
   try {
     const designation = await req.designation.destroy();
-    const message = "Designation deleted successfully.";
+    const message = 'Designation deleted successfully.';
 
     res_obj.message = message;
 
@@ -158,7 +158,7 @@ const deleteDesignation = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
 
     returnError(res_obj);
@@ -167,15 +167,15 @@ const deleteDesignation = async (req, res, next) => {
 
 const updateDesignation = async (req, res, next) => {
   var log_obj = {
-    action: "update_designation",
-    module: "preferences",
-    sub_module: "designation",
+    action: 'update_designation',
+    module: 'preferences',
+    sub_module: 'designation',
     payload: null,
     description: null,
     database: true,
   };
 
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const { name } = req.body;
     const sys_designation = req.sys_designation;
@@ -184,7 +184,7 @@ const updateDesignation = async (req, res, next) => {
     });
     const updated_sys_designation = await sys_designation.save();
 
-    const message = "Designation updated successfully";
+    const message = 'Designation updated successfully';
     res_obj.message = message;
     log_obj.payload = JSON.stringify({
       from: sys_designation,
@@ -196,7 +196,7 @@ const updateDesignation = async (req, res, next) => {
   } catch (error) {
     const message = error.message;
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     logError(req, message, req.decoded.id, log_obj);
     returnError(res_obj);
   }
