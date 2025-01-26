@@ -118,6 +118,30 @@ async function validateDeleteBranch(req, res, next) {
       ],
     });
 
+    if (!sys_branch) {
+      const message = 'Invalid branch.';
+      logError(req, message, req.decoded.id);
+
+      const returnObj = {
+        status: 'error',
+        message,
+        payload: {},
+        res,
+      };
+      return returnError(returnObj);
+    }
+    if (sys_branch && sys_branch.dataValues.id === 1) {
+      const message = 'Cannot delete the headquater branch.';
+      logError(req, message, req.decoded.id);
+
+      const returnObj = {
+        status: 'error',
+        message,
+        payload: {},
+        res,
+      };
+      return returnError(returnObj);
+    }
     if (sys_branch.dataValues.users.length) {
       const message = 'Cannot delete branch with users associated with it.';
       logError(req, message, req.decoded.id);

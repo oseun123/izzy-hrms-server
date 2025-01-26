@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("users", {
+    await queryInterface.createTable('users', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -9,6 +9,9 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       first_name: {
+        type: Sequelize.STRING,
+      },
+      middle_name: {
         type: Sequelize.STRING,
       },
       last_name: {
@@ -20,46 +23,61 @@ module.exports = {
       password: {
         type: Sequelize.STRING,
       },
+      employee_number: {
+        type: Sequelize.STRING,
+        unique: true, // Ensure employee numbers are unique
+      },
+      primary_supervisor: {
+        type: Sequelize.INTEGER,
+        references: { model: 'users', key: 'id' }, // Assuming supervisors are also users
+      },
+      secondary_supervisor: {
+        type: Sequelize.INTEGER,
+        references: { model: 'users', key: 'id' }, // Assuming supervisors are also users
+      },
+      employment_date: {
+        type: Sequelize.DATE,
+        allowNull: true, // Employment date is required
+      },
       department_id: {
         type: Sequelize.INTEGER,
-        references: { model: "departments", key: "id" },
+        references: { model: 'departments', key: 'id' },
       },
       gender_id: {
         type: Sequelize.INTEGER,
-        references: { model: "genders", key: "id" },
+        references: { model: 'genders', key: 'id' },
       },
       grade_id: {
         type: Sequelize.INTEGER,
-        references: { model: "grades", key: "id" },
+        references: { model: 'grades', key: 'id' },
       },
       step_id: {
         type: Sequelize.INTEGER,
-        references: { model: "steps", key: "id" },
+        references: { model: 'steps', key: 'id' },
       },
       designation_id: {
         type: Sequelize.INTEGER,
-        references: { model: "designations", key: "id" },
+        references: { model: 'designations', key: 'id' },
       },
       employeecategory_id: {
         type: Sequelize.INTEGER,
-        references: { model: "employeecategories", key: "id" },
+        references: { model: 'employeecategories', key: 'id' },
       },
       employeestatus_id: {
         type: Sequelize.INTEGER,
-        references: { model: "employeestatuses", key: "id" },
+        references: { model: 'employeestatuses', key: 'id' },
       },
       country_id: {
         type: Sequelize.INTEGER,
-        references: { model: "countries", key: "id" },
+        references: { model: 'countries', key: 'id' },
       },
       state_id: {
         type: Sequelize.INTEGER,
-        references: { model: "states", key: "id" },
+        references: { model: 'states', key: 'id' },
       },
-
       branch_id: {
         type: Sequelize.INTEGER,
-        references: { model: "branches", key: "id" },
+        references: { model: 'branches', key: 'id' },
       },
       created_at: {
         allowNull: false,
@@ -72,6 +90,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("users");
+    await queryInterface.dropTable('users');
   },
 };

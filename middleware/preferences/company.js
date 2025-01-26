@@ -1,14 +1,14 @@
-const validator = require("validator");
-const { Company, Branch } = require("../../models");
-const { returnError, logError } = require("../../utils/helper");
+const validator = require('validator');
+const { Company, Branch } = require('../../models');
+const { returnError, logError } = require('../../utils/helper');
 
 async function validateCompany(req, res, next) {
   const { name } = req.body;
 
-  if (name === "") {
+  if (name === '') {
     const returnObj = {
-      status: "error",
-      message: "Name is required",
+      status: 'error',
+      message: 'Name is required',
       payload: {},
       res,
     };
@@ -18,8 +18,8 @@ async function validateCompany(req, res, next) {
       const is_name = await Company.findOne({ where: { name } });
       if (is_name) {
         const returnObj = {
-          status: "error",
-          message: "Company already exist.",
+          status: 'error',
+          message: 'Company already exist.',
           payload: {},
           res,
         };
@@ -27,7 +27,7 @@ async function validateCompany(req, res, next) {
       }
     } catch (error) {
       const returnObj = {
-        status: "error",
+        status: 'error',
         message: error.message,
         payload: {},
         res,
@@ -46,17 +46,43 @@ async function validateDeleteCompany(req, res, next) {
       include: [
         {
           model: Branch,
-          as: "branches",
+          as: 'branches',
         },
       ],
     });
 
-    if (sys_company.dataValues.branches.length) {
-      const message = "Cannot delete company with branches associated with it.";
+    if (!sys_company) {
+      const message = 'Invalid company';
       logError(req, message, req.decoded.id);
 
       const returnObj = {
-        status: "error",
+        status: 'error',
+        message,
+        payload: {},
+        res,
+      };
+      return returnError(returnObj);
+    }
+
+    if (sys_company && sys_company.dataValues.id === 1) {
+      const message = 'Cannot delete this company.';
+      logError(req, message, req.decoded.id);
+
+      const returnObj = {
+        status: 'error',
+        message,
+        payload: {},
+        res,
+      };
+      return returnError(returnObj);
+    }
+
+    if (sys_company.dataValues.branches.length) {
+      const message = 'Cannot delete company with branches associated with it.';
+      logError(req, message, req.decoded.id);
+
+      const returnObj = {
+        status: 'error',
         message,
         payload: {},
         res,
@@ -66,7 +92,7 @@ async function validateDeleteCompany(req, res, next) {
     req.sys_company = sys_company;
   } catch (error) {
     const returnObj = {
-      status: "error",
+      status: 'error',
       message: error.message,
       payload: {},
       res,
@@ -86,10 +112,10 @@ async function validateUpdateCompany(req, res, next) {
       req.sys_company = sys_company;
       next();
     } else {
-      const message = "Invalid company selection.";
+      const message = 'Invalid company selection.';
       logError(req, message, req.decoded.id);
       return returnError({
-        status: "error",
+        status: 'error',
         message: message,
         payload: {},
         res,
@@ -97,7 +123,7 @@ async function validateUpdateCompany(req, res, next) {
     }
   } catch (error) {
     const returnObj = {
-      status: "error",
+      status: 'error',
       message: error.message,
       payload: {},
       res,
