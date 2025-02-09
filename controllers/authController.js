@@ -6,8 +6,8 @@ const {
   Permission,
   Client,
   AuditLog,
-} = require("../models");
-const sendEmail = require("../utils/sendEmail");
+} = require('../models');
+const sendEmail = require('../utils/sendEmail');
 const {
   createToken,
   verifyToken,
@@ -16,40 +16,40 @@ const {
   createRefreshToken,
   verifyTokenRefresh,
   getUserPermissions,
-} = require("../utils/auth");
+} = require('../utils/auth');
 const {
   logInfo,
   logError,
   returnError,
   returnSuccess,
-} = require("./../utils/helper");
-const { resetLinkTempale } = require("./../utils/template/authTemplate");
+} = require('./../utils/helper');
+const { resetLinkTemplate } = require('./../utils/template/authTemplate');
 const { NODE_ENV, APP_NAME, APP_MAIL_FROM, APP_JWT_COOKIE } = process.env;
 
 exports.signIn = async (req, res, next) => {
   try {
     var log_obj = {
-      action: "login",
-      module: "auth",
+      action: 'login',
+      module: 'auth',
       sub_module: null,
       payload: null,
       description: null,
       database: true,
     };
 
-    var res_obj = { res, message: "", payload: {} };
+    var res_obj = { res, message: '', payload: {} };
 
     const { email, password } = req.body;
     var user = await User.findOne({
       where: { email: email },
       include: {
         model: Role,
-        as: "roles",
-        attributes: ["id"],
+        as: 'roles',
+        attributes: ['id'],
         include: {
           model: Permission,
-          as: "permissions",
-          attributes: ["id", "name", "for", "action", "menu", "url", "module"],
+          as: 'permissions',
+          attributes: ['id', 'name', 'for', 'action', 'menu', 'url', 'module'],
         },
       },
     });
@@ -57,8 +57,8 @@ exports.signIn = async (req, res, next) => {
     if (user) {
       //  get last login
       var user_last_log = await AuditLog.findOne({
-        where: { user_id: user.id, action: "login", level: "success" },
-        order: [["id", "DESC"]],
+        where: { user_id: user.id, action: 'login', level: 'success' },
+        order: [['id', 'DESC']],
       });
 
       if (user && comparePassword(password, user.password)) {
@@ -75,14 +75,14 @@ exports.signIn = async (req, res, next) => {
         res.cookie(APP_JWT_COOKIE, refreshToken, {
           // domain: "localhost",
           httpOnly: true,
-          sameSite: "None",
+          sameSite: 'None',
           secure: true,
           maxAge: 24 * 60 * 60 * 1000,
         });
 
         const permissions = getUserPermissions(user);
 
-        const message = "Sign in successfully";
+        const message = 'Sign in successfully';
 
         logInfo(req, message, user.id, log_obj);
 
@@ -102,14 +102,14 @@ exports.signIn = async (req, res, next) => {
 
         returnSuccess(res_obj);
       } else {
-        const message = "Invalid email/password combination";
+        const message = 'Invalid email/password combination';
         logError(req, message, user.id, log_obj);
         res_obj.message = message;
 
         returnError(res_obj);
       }
     } else {
-      const message = "Invalid email/password combination";
+      const message = 'Invalid email/password combination';
       // logError(req, message, "NAN", log_obj);
       res_obj.message = message;
 
@@ -119,7 +119,7 @@ exports.signIn = async (req, res, next) => {
     const message = error.message;
     logError(req, message, user, log_obj);
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     returnError(res_obj);
   }
 };
@@ -129,20 +129,20 @@ exports.sendResetLink = async (req, res, next) => {
     const { email } = req.body;
     const { protocol, hostname } = req;
     var log_obj = {
-      action: "reset_password",
-      module: "auth",
+      action: 'reset_password',
+      module: 'auth',
       sub_module: null,
       payload: null,
       description: null,
       database: true,
     };
 
-    var res_obj = { res, message: "", payload: {} };
+    var res_obj = { res, message: '', payload: {} };
 
     var user = await User.findOne({ where: { email: email } });
 
     if (user === null) {
-      const message = "Email not found";
+      const message = 'Email not found';
       logError(req, message, user.id, log_obj);
       res_obj.message = message;
 
@@ -151,30 +151,30 @@ exports.sendResetLink = async (req, res, next) => {
 
     //  get last login
     var user_last_log = await AuditLog.findOne({
-      where: { user_id: user.id, action: "login", level: "success" },
-      order: [["id", "DESC"]],
+      where: { user_id: user.id, action: 'login', level: 'success' },
+      order: [['id', 'DESC']],
     });
 
     const token = createToken(
       { ...user.dataValues, last_login: user_last_log?.dataValues?.created_at },
-      "1h"
+      '1h',
     );
     // save token in db
     PasswordReset.create({
       user_id: user.id,
       token,
     });
-    const port = NODE_ENV === "development" ? ":3000" : "";
+    const port = NODE_ENV === 'development' ? ':3000' : '';
     const link = `${protocol}://${hostname}${port}/reset-password/${token}`;
-
+    const emailBody = await resetLinkTemplate(link, user);
     const sent = await sendEmail(
       email,
       `${APP_MAIL_FROM}`,
       `${APP_NAME} password reset`,
-      resetLinkTempale(link)
+      emailBody,
     );
     if (sent) {
-      const message = "Password reset link has been sent successfully";
+      const message = 'Password reset link has been sent successfully';
       logInfo(req, message, user.id, log_obj);
       res_obj.message = message;
 
@@ -184,7 +184,7 @@ exports.sendResetLink = async (req, res, next) => {
     const message = error.message;
     logError(req, message, user?.id, log_obj);
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
     returnError(res_obj);
   }
 };
@@ -192,14 +192,14 @@ exports.sendResetLink = async (req, res, next) => {
 exports.resetPassword = async (req, res, next) => {
   try {
     var log_obj = {
-      action: "reset_password",
-      module: "auth",
+      action: 'reset_password',
+      module: 'auth',
       sub_module: null,
       payload: null,
       description: null,
       database: true,
     };
-    var res_obj = { res, message: "", payload: {} };
+    var res_obj = { res, message: '', payload: {} };
     const { password } = req.body;
     const { token } = req.params;
     const decoded = verifyToken(token);
@@ -215,7 +215,7 @@ exports.resetPassword = async (req, res, next) => {
       if (updatedUser && tokenDB) {
         await updatedUser.update({ password: hash });
         tokenDB.destroy();
-        const message = "Password reset successfully";
+        const message = 'Password reset successfully';
         log_obj.payload = JSON.stringify({
           password: hash,
         });
@@ -232,7 +232,7 @@ exports.resetPassword = async (req, res, next) => {
         };
         returnSuccess(res_obj);
       } else {
-        const message = "Invalid Token, Kindly reset password again0";
+        const message = 'Invalid Token, Kindly reset password again0';
 
         logError(req, message, updatedUser.id, log_obj);
 
@@ -240,7 +240,7 @@ exports.resetPassword = async (req, res, next) => {
         returnError(res_obj);
       }
     } else {
-      const message = "Invalid Token, Kindly reset password again1";
+      const message = 'Invalid Token, Kindly reset password again1';
       logError(req, message, updatedUser.id, log_obj);
 
       res_obj.message = message;
@@ -251,7 +251,7 @@ exports.resetPassword = async (req, res, next) => {
     logError(req, message, updatedUser, log_obj);
 
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
 
     returnError(res_obj);
   }
@@ -260,14 +260,14 @@ exports.resetPassword = async (req, res, next) => {
 exports.logout = async (req, res, next) => {
   try {
     var log_obj = {
-      action: "logout",
-      module: "auth",
+      action: 'logout',
+      module: 'auth',
       sub_module: null,
       payload: null,
       description: null,
       database: true,
     };
-    var res_obj = { res, message: "", payload: {} };
+    var res_obj = { res, message: '', payload: {} };
 
     var user = await User.findOne({ where: { id: req.decoded.id } });
 
@@ -276,11 +276,11 @@ exports.logout = async (req, res, next) => {
     });
 
     if (user) {
-      const message = "Logout successfully";
+      const message = 'Logout successfully';
       logInfo(req, message, user.id, log_obj);
       res.clearCookie(APP_JWT_COOKIE, {
         httpOnly: true,
-        sameSite: "None",
+        sameSite: 'None',
         secure: true,
       });
 
@@ -302,7 +302,7 @@ exports.logout = async (req, res, next) => {
     logError(req, message, user.id, log_obj);
 
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
 
     returnError(res_obj);
   }
@@ -318,8 +318,8 @@ exports.test = async (req, res, next) => {
     //   { name: "Kemi", age: "22" },
     // ];
     return res.status(200).send({
-      status: "success",
-      message: "ok",
+      status: 'success',
+      message: 'ok',
       payload: {
         emp: system_perm,
       },
@@ -329,7 +329,7 @@ exports.test = async (req, res, next) => {
     const message = error.message;
 
     return res.status(400).send({
-      status: "error",
+      status: 'error',
       message: message,
       payload: {},
     });
@@ -342,13 +342,13 @@ exports.refresh = async (req, res, next) => {
     // console.log(decoded);
     const session = await UserSession.findOne({
       where: { user_id: decoded.id, refresh_token: jwt },
-      order: [["created_at", "DESC"]],
+      order: [['created_at', 'DESC']],
     });
     //  get last login
 
     var user_last_log = await AuditLog.findOne({
-      where: { user_id: decoded.id, action: "login", level: "success" },
-      order: [["id", "DESC"]],
+      where: { user_id: decoded.id, action: 'login', level: 'success' },
+      order: [['id', 'DESC']],
     });
 
     if (session) {
@@ -359,17 +359,17 @@ exports.refresh = async (req, res, next) => {
     }
 
     return res.status(200).send({
-      status: "success",
-      message: "ok",
+      status: 'success',
+      message: 'ok',
       payload: {
         new_token,
       },
     });
   } catch (error) {
-    const message = "Invalid Session. Kindly login again.";
+    const message = 'Invalid Session. Kindly login again.';
 
     return res.status(403).send({
-      status: "error",
+      status: 'error',
       message: message,
       payload: {},
     });
@@ -378,21 +378,21 @@ exports.refresh = async (req, res, next) => {
 exports.currentClient = async (req, res, next) => {
   try {
     var log_obj = {
-      action: "client",
-      module: "auth",
+      action: 'client',
+      module: 'auth',
       sub_module: null,
       payload: null,
       description: null,
       database: true,
     };
-    var res_obj = { res, message: "", payload: {} };
+    var res_obj = { res, message: '', payload: {} };
 
     const current_cleint = await Client.findOne({
       where: { id: 1 },
     });
 
     if (current_cleint) {
-      const message = "Client fetched successfully";
+      const message = 'Client fetched successfully';
       logInfo(req, message, null, log_obj);
       res_obj.message = message;
       res_obj.payload = {
@@ -401,7 +401,7 @@ exports.currentClient = async (req, res, next) => {
 
       returnSuccess(res_obj);
     } else {
-      const message = "Something went wrong";
+      const message = 'Something went wrong';
       logError(req, message, null, log_obj);
       res_obj.message = message;
       returnError(res_obj);
@@ -416,14 +416,14 @@ exports.currentClient = async (req, res, next) => {
 
 exports.updateClientSettings = async (req, res, next) => {
   var log_obj = {
-    action: "update-client",
-    module: "auth",
+    action: 'update-client',
+    module: 'auth',
     sub_module: null,
     payload: null,
     description: null,
     database: true,
   };
-  var res_obj = { res, message: "", payload: {} };
+  var res_obj = { res, message: '', payload: {} };
   try {
     const new_settings = req.body.settings;
 
@@ -437,7 +437,7 @@ exports.updateClientSettings = async (req, res, next) => {
       });
 
       const updated_client = await current_cleint.save();
-      const message = "Display setting updated successfully";
+      const message = 'Display setting updated successfully';
       res_obj.message = message;
       log_obj.payload = JSON.stringify({
         from: current_cleint,
@@ -448,7 +448,7 @@ exports.updateClientSettings = async (req, res, next) => {
 
       returnSuccess(res_obj);
     } else {
-      const message = "Something went wrong";
+      const message = 'Something went wrong';
       logError(req, message, null, log_obj);
       res_obj.message = message;
       returnError(res_obj);
@@ -457,7 +457,7 @@ exports.updateClientSettings = async (req, res, next) => {
     const message = error.message;
     logError(req, message, null, log_obj);
     res_obj.message =
-      NODE_ENV === "development" ? `${message}` : "Something went wrong";
+      NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
 
     returnError(res_obj);
   }
