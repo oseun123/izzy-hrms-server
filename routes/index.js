@@ -10,12 +10,13 @@
  * @requires utilRoute
  */
 
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const authRoute = require("./authRoute");
-const preferencesRoute = require("./preferencesRoute");
-const utilRoute = require("./utilRoute");
+const authRoute = require('./authRoute');
+const preferencesRoute = require('./preferencesRoute');
+const utilRoute = require('./utilRoute');
+const humanResourceRoute = require('./humanResourceRoute');
 
 /**
  * Authentication Routes
@@ -23,7 +24,7 @@ const utilRoute = require("./utilRoute");
  * @route {GET|POST|PUT|DELETE} /auth
  * @description Handles authentication-related operations, such as login and registration.
  */
-router.use("/auth", authRoute);
+router.use('/auth', authRoute);
 
 /**
  * Preferences Routes
@@ -31,7 +32,7 @@ router.use("/auth", authRoute);
  * @route {GET|POST|PUT|DELETE} /preferences
  * @description Manages user preferences and related configurations.
  */
-router.use("/preferences", preferencesRoute);
+router.use('/preferences', preferencesRoute);
 
 /**
  * Utility Routes
@@ -39,6 +40,13 @@ router.use("/preferences", preferencesRoute);
  * @route {GET|POST|PUT|DELETE} /utils
  * @description Provides utility functions, such as file handling or miscellaneous operations.
  */
-router.use("/utils", utilRoute);
+router.use('/utils', utilRoute);
+/**
+ * Human Resource Routes
+ *
+ * @route {GET|POST|PUT|DELETE} /utils
+ * @description Provides utility functions, such as file handling or miscellaneous operations.
+ */
+router.use('/hris', humanResourceRoute);
 
 module.exports = router;
