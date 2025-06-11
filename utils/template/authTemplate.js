@@ -17,18 +17,25 @@ const getMailHeaders = async () => {
   `;
 };
 
-const mailFooter = `
-<mj-section background-color="#e7e7e7">
+const getMailFooter = async () => {
+  const client = await Client.findOne({ where: { id: 1 } });
+  const currentYear = new Date().getFullYear();
+  return `
+<mj-section background-color="#e7e7e7" padding="20px 0">
   <mj-column>
-    <mj-social>
-      <mj-social-element name="facebook">Share</mj-social-element>
-    </mj-social>
+    <mj-text align="center" font-size="14px" color="#555555">
+      Copyright © ${currentYear} ${
+    client ? client.dataValues.name : 'Your Company'
+  }. All rights reserved.
+    </mj-text>
   </mj-column>
 </mj-section>
 `;
+};
 
 const resetLinkTemplate = async (link, user) => {
   const mailHeaders = await getMailHeaders(); // Fetch dynamically
+  const mailFooter = await getMailFooter(); // Fetch dynamically
 
   return mjml(`
 <mjml>
@@ -68,6 +75,46 @@ const resetLinkTemplate = async (link, user) => {
 `).html; // Convert final template to HTML
 };
 
+const employeeSetupTemplate = async (link, user) => {
+  const mailHeaders = await getMailHeaders(); // Fetch dynamically
+  const mailFooter = await getMailFooter(); // Fetch dynamically
+
+  return mjml(`
+<mjml>
+  <mj-body>
+    ${mailHeaders}
+    <mj-section>
+      <mj-column>
+        <mj-text>
+          Hello ${user.first_name || 'Employee'},
+        </mj-text>
+        <mj-text>
+          Welcome aboard! To complete your employee account setup, please click the button below:
+        </mj-text>
+        <mj-button background-color="#0A84FF" align="left" href="${link}">
+          Set Up Your Account
+        </mj-button>
+        <mj-text>
+          This setup link is valid for a limited time. If you did not expect this email, you may ignore it.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-divider />
+        <mj-text>
+          Or copy and paste this link into your browser:
+        </mj-text>
+        <mj-text>${link}</mj-text>
+      </mj-column>
+    </mj-section>
+    ${mailFooter}
+  </mj-body>
+</mjml>
+`).html;
+};
+
 module.exports = {
   resetLinkTemplate,
+  employeeSetupTemplate,
 };

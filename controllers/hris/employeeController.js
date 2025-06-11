@@ -8,6 +8,8 @@
  */
 
 const { User } = require('../../models');
+const sendEmail = require('../../utils/sendEmail');
+const { employeeSetupTemplate } = require('../../utils/template/authTemplate');
 const {
   logInfo,
   logError,
@@ -15,7 +17,7 @@ const {
   returnError,
 } = require('./../../utils/helper');
 
-const { NODE_ENV } = process.env;
+const { NODE_ENV, APP_NAME, APP_MAIL_FROM } = process.env;
 
 /**
  * Creates a new employee.
@@ -82,13 +84,6 @@ const createEmployee = async (req, res, next) => {
       gender_id,
     } = req.body;
 
-    console.log({
-      middle_name,
-      primary_supervisor,
-      secondary_supervisor,
-      employment_date,
-    });
-
     const new_employee = await User.create({
       first_name,
       middle_name,
@@ -115,9 +110,18 @@ const createEmployee = async (req, res, next) => {
     log_obj.payload = JSON.stringify(new_employee);
 
     logInfo(req, message, req.decoded.id, log_obj);
-    returnSuccess(res_obj);
+    const sent = setupEmail(req, new_employee);
+    if (sent) {
+      returnSuccess(res_obj);
+    } else {
+      const message = 'Email failed';
+      res_obj.message =
+        NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
+      logError(req, message, req.decoded.id, log_obj);
+
+      returnError(res_obj);
+    }
   } catch (error) {
-    console.error('Sequelize Validation Error:', error);
     const message = error.message;
     res_obj.message =
       NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
@@ -125,6 +129,22 @@ const createEmployee = async (req, res, next) => {
 
     returnError(res_obj);
   }
+};
+
+const setupEmail = async (req, user) => {
+  const { protocol, hostname } = req;
+  const port = NODE_ENV === 'development' ? ':3000' : '';
+  const link = `${protocol}://${hostname}${port}/setup-password`;
+  const emailBody = await employeeSetupTemplate(link, user);
+
+  const sent = await sendEmail(
+    user.email,
+    `${APP_MAIL_FROM}`,
+    `${APP_NAME} account setup`,
+    emailBody,
+  );
+
+  return sent;
 };
 
 // /**
