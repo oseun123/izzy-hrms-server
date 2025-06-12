@@ -1,17 +1,22 @@
-const logger = require("./../utils/logger");
-const { AuditLog, User, Permission, Role } = require("./../models");
-const { getUserPermissions } = require("./auth");
+const logger = require('./../utils/logger');
+const crypto = require('crypto');
+const { AuditLog, User, Permission, Role } = require('./../models');
+const { getUserPermissions } = require('./auth');
+
+const generateSetupToken = () => {
+  return crypto.randomBytes(32).toString('hex'); // 64-character hex string
+};
 
 const getClientAddress = (req) => {
   return {
     clientAddress:
-      (req.headers["x-forwarded-for"] || "").split(",")[0] ||
+      (req.headers['x-forwarded-for'] || '').split(',')[0] ||
       req.connection.remoteAddress,
   };
 };
 const getUserAgent = (req) => {
   return {
-    userAgent: req.headers["user-agent"],
+    userAgent: req.headers['user-agent'],
   };
 };
 
@@ -20,22 +25,22 @@ const logInfo = (req, message, user_id = null, obj = {}) => {
   const userAgent = getUserAgent(req);
   const id = { user_id };
   if (
-    obj.hasOwnProperty("database") ||
-    (obj.hasOwnProperty("database") && obj.database === true)
+    obj.hasOwnProperty('database') ||
+    (obj.hasOwnProperty('database') && obj.database === true)
   ) {
     AuditLog.create({
       user_id,
       ip: JSON.stringify(ip),
       user_agent: JSON.stringify(userAgent),
       message,
-      level: "success",
+      level: 'success',
       ...obj,
     });
   }
   return logger.info(
     `${message}--${JSON.stringify(ip)}--${JSON.stringify(
-      userAgent
-    )}--${JSON.stringify(id)}--${JSON.stringify(obj)}`
+      userAgent,
+    )}--${JSON.stringify(id)}--${JSON.stringify(obj)}`,
   );
 };
 const logError = (req, message, user_id = null, obj = {}) => {
@@ -48,13 +53,13 @@ const logError = (req, message, user_id = null, obj = {}) => {
     ip: JSON.stringify(ip),
     user_agent: JSON.stringify(userAgent),
     message,
-    level: "error",
+    level: 'error',
     ...obj,
   });
   return logger.error(
     `${message}--${JSON.stringify(ip)}--${JSON.stringify(
-      userAgent
-    )}--${JSON.stringify(id)}--${JSON.stringify(obj)}`
+      userAgent,
+    )}--${JSON.stringify(id)}--${JSON.stringify(obj)}`,
   );
 };
 
@@ -66,19 +71,19 @@ const hasPermission = (perm) => {
         where: { id: user_id },
         include: {
           model: Role,
-          as: "roles",
-          attributes: ["id"],
+          as: 'roles',
+          attributes: ['id'],
           include: {
             model: Permission,
-            as: "permissions",
+            as: 'permissions',
             attributes: [
-              "id",
-              "name",
-              "for",
-              "action",
-              "menu",
-              "url",
-              "module",
+              'id',
+              'name',
+              'for',
+              'action',
+              'menu',
+              'url',
+              'module',
             ],
           },
         },
@@ -91,10 +96,10 @@ const hasPermission = (perm) => {
       if (perm_array.includes(perm)) {
         next();
       } else {
-        const message = "Not authorized to perform this action.";
+        const message = 'Not authorized to perform this action.';
         logError(req, message, req.decoded.id);
         return res.status(400).send({
-          status: "error",
+          status: 'error',
           message: message,
           payload: {},
         });
@@ -103,7 +108,7 @@ const hasPermission = (perm) => {
       const message = error.message;
       logError(req, message, req.decoded.id);
       return res.status(400).send({
-        status: "error",
+        status: 'error',
         message: message,
         payload: {},
       });
@@ -113,14 +118,14 @@ const hasPermission = (perm) => {
 
 const returnSuccess = (obj) => {
   return obj.res.status(200).send({
-    status: "success",
+    status: 'success',
     message: obj.message,
     payload: obj.payload,
   });
 };
 const returnError = (obj) => {
   return obj.res.status(400).send({
-    status: "error",
+    status: 'error',
     message: obj.message,
     payload: obj.payload,
   });
@@ -133,4 +138,5 @@ module.exports = {
   hasPermission,
   returnSuccess,
   returnError,
+  generateSetupToken,
 };

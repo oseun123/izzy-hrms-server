@@ -88,6 +88,7 @@ module.exports = (sequelize, DataTypes) => {
       last_name: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
+      setup_token: DataTypes.STRING,
       employee_number: DataTypes.STRING, // Add this
       employment_date: DataTypes.DATEONLY, // Add this
       department_id: DataTypes.INTEGER,
