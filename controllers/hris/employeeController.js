@@ -1,4 +1,4 @@
-const { User } = require('../../models');
+const { User, Role } = require('../../models');
 const { hashPassword } = require('../../utils/auth');
 const sendEmail = require('../../utils/sendEmail');
 const { employeeSetupTemplate } = require('../../utils/template/authTemplate');
@@ -69,22 +69,20 @@ const createEmployee = async (req, res, next) => {
       gender_id,
       setup_token,
     });
+    // set defaultRole
+    await setDefaultRole(new_employee);
+
     const message = 'Employee created Successfully';
     res_obj.message = message;
     log_obj.payload = JSON.stringify(new_employee);
 
     logInfo(req, message, req.decoded.id, log_obj);
     const sent = setupEmail(req, new_employee);
-    if (sent) {
-      returnSuccess(res_obj);
-    } else {
-      const message = 'Email failed';
-      res_obj.message =
-        NODE_ENV === 'development' ? `${message}` : 'Something went wrong';
-      logError(req, message, req.decoded.id, log_obj);
-
-      returnError(res_obj);
+    if (!sent) {
+      await new_employee.destroy();
+      throw new Error('setup Email failed. User not created');
     }
+    returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
     res_obj.message =
@@ -95,6 +93,15 @@ const createEmployee = async (req, res, next) => {
   }
 };
 
+const setDefaultRole = async (new_employee) => {
+  const defaultRole = await Role.findOne({ where: { default: 1 } });
+  if (defaultRole) {
+    await new_employee.addRole(defaultRole);
+  } else {
+    await new_employee.destroy(); // Delete the user if no default role is found
+    throw new Error('Default role not found. User not created.');
+  }
+};
 const setupEmail = async (req, user) => {
   const { protocol, hostname } = req;
   const port = NODE_ENV === 'development' ? ':3000' : '';
