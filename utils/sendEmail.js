@@ -1,17 +1,16 @@
-"use strict";
-const nodemailer = require("nodemailer");
-require("dotenv").config();
+'use strict';
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 
-const { MAIL_USER, MAIL_PASS } = process.env;
+const { MAIL_USER, MAIL_PASS, MAIL_HOST, MAIL_PORT } = process.env;
 
 async function sendEmail(to, from, subject, body) {
-  console.log(from);
   let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    // logger: true,
-    // debug: true,
+    host: MAIL_HOST,
+    port: 2525,
+    secure: false, // true for 465, false for other ports
+    logger: true,
+    debug: true,
 
     auth: {
       user: MAIL_USER,

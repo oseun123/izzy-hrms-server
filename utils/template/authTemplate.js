@@ -10,7 +10,7 @@ const getMailHeaders = async () => {
                  font-style="italic"
                  font-size="20px"
                  color="#626262">
-          ${client ? client.dataValues.name : 'Your Company'}
+          ${client ? client.dataValues.name + ' HRMS' : 'Your Company'}
         </mj-text>
       </mj-column>
     </mj-section>
@@ -25,7 +25,7 @@ const getMailFooter = async () => {
   <mj-column>
     <mj-text align="center" font-size="14px" color="#555555">
       Copyright © ${currentYear} ${
-    client ? client.dataValues.name : 'Your Company'
+    client ? client.dataValues.name + ' HRMS' : 'Your Company'
   }. All rights reserved.
     </mj-text>
   </mj-column>

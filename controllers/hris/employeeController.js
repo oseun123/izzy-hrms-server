@@ -1,4 +1,4 @@
-const { User, Role } = require('../../models');
+const { User, Role, EmployeeNumber } = require('../../models');
 const { hashPassword } = require('../../utils/auth');
 const sendEmail = require('../../utils/sendEmail');
 const { employeeSetupTemplate } = require('../../utils/template/authTemplate');
@@ -71,17 +71,26 @@ const createEmployee = async (req, res, next) => {
     });
     // set defaultRole
     await setDefaultRole(new_employee);
+    // increase emp number
+    await increaseEmpNumber();
 
     const message = 'Employee created Successfully';
     res_obj.message = message;
     log_obj.payload = JSON.stringify(new_employee);
 
-    logInfo(req, message, req.decoded.id, log_obj);
-    const sent = setupEmail(req, new_employee);
-    if (!sent) {
-      await new_employee.destroy();
-      throw new Error('setup Email failed. User not created');
+    // send email only if employee is active
+
+    if (parseInt(employeestatus_id) === 1) {
+      const sent = await setupEmail(req, new_employee);
+
+      console.log({ sent });
+      if (!sent) {
+        await new_employee.destroy();
+        throw new Error('setup Email failed. User not created');
+      }
     }
+
+    logInfo(req, message, req.decoded.id, log_obj);
     returnSuccess(res_obj);
   } catch (error) {
     const message = error.message;
@@ -107,15 +116,31 @@ const setupEmail = async (req, user) => {
   const port = NODE_ENV === 'development' ? ':3000' : '';
   const link = `${protocol}://${hostname}${port}/setup-password?token=${user.setup_token}`;
   const emailBody = await employeeSetupTemplate(link, user);
-
+  console.log('here');
   const sent = await sendEmail(
     user.email,
-    `${APP_MAIL_FROM}`,
+    `oseun04@gmail.com`,
     `${APP_NAME} account setup`,
     emailBody,
   );
-
+  console.log('here1');
   return sent;
+};
+
+const increaseEmpNumber = async () => {
+  const format = await EmployeeNumber.findByPk(1);
+  const sequence = format.sequence;
+  const status = format.status;
+
+  if (status) {
+    const new_seque = parseInt(sequence, 10) + 1;
+    const new_sequence = new_seque.toString().padStart(sequence.length, '0');
+
+    format.set({
+      sequence: new_sequence,
+    });
+    await format.save();
+  }
 };
 
 const setPassword = async (req, res, next) => {
