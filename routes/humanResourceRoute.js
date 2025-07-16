@@ -4,8 +4,12 @@ const { authorizeMiddleware } = require('../middleware/authorize');
 const {
   createEmployee,
   setPassword,
+  uploadProfilePic,
 } = require('../controllers/hris/employeeController');
-const { validateCreateEmployee } = require('../middleware/hris/createEmployee');
+const {
+  validateCreateEmployee,
+  validateProfilePicUpload,
+} = require('../middleware/hris/createEmployee');
 
 const router = express.Router();
 
@@ -15,6 +19,12 @@ router.post(
   authorizeMiddleware,
   validateCreateEmployee,
   createEmployee,
+);
+router.post(
+  '/upload-employee-pic',
+  authorizeMiddleware,
+  validateProfilePicUpload,
+  uploadProfilePic,
 );
 
 router.post('/create-employee/setup-password', setPassword);

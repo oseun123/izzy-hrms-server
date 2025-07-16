@@ -79,6 +79,22 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'step_id',
         as: 'step',
       });
+
+      // One-to-many: all pictures
+      this.hasMany(models.UserProfilePic, {
+        foreignKey: 'user_id',
+        as: 'profile_pics',
+      });
+
+      // One-to-one: only the active profile picture
+      this.hasOne(models.UserProfilePic, {
+        foreignKey: 'user_id',
+        as: 'active_profile_pic',
+        scope: {
+          status: 'active',
+        },
+        constraints: false,
+      });
     }
   }
   User.init(
