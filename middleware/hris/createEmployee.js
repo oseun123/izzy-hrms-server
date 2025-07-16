@@ -196,7 +196,43 @@ async function validateCreateEmployee(req, res, next) {
 
   next();
 }
+async function validateProfilePicUpload(req, res, next) {
+  const { user_id } = req.body;
+  const file = req.files.image;
+
+  if (!user_id) {
+    return returnError({ message: 'user_id is required', payload: {}, res });
+  }
+
+  // File is required
+  if (!req.files || !req.files.image) {
+    return returnError({ message: 'Image file is required', payload: {}, res });
+  }
+
+  // Check file type
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+  if (!allowedTypes.includes(file.mimetype)) {
+    return returnError({
+      message: 'Only JPEG and PNG are allowed',
+      payload: {},
+      res,
+    });
+  }
+
+  // Check file size (2MB max)
+  const maxSize = 2 * 1024 * 1024;
+  if (file.size > maxSize) {
+    return returnError({
+      message: 'Image must be less than 2MB',
+      payload: {},
+      res,
+    });
+  }
+
+  next();
+}
 
 module.exports = {
   validateCreateEmployee,
+  validateProfilePicUpload,
 };

@@ -1,4 +1,10 @@
-const { User, Role, EmployeeNumber } = require('../../models');
+const {
+  User,
+  Role,
+  EmployeeNumber,
+  UserProfilePic,
+  Client,
+} = require('../../models');
 const { hashPassword } = require('../../utils/auth');
 const sendEmail = require('../../utils/sendEmail');
 const { employeeSetupTemplate } = require('../../utils/template/authTemplate');
@@ -9,6 +15,8 @@ const {
   returnError,
   generateSetupToken,
 } = require('./../../utils/helper');
+
+const cloudinary = require('./../../config/cloudinary');
 
 const { NODE_ENV, APP_NAME, APP_MAIL_FROM } = process.env;
 
@@ -83,7 +91,7 @@ const createEmployee = async (req, res, next) => {
     if (parseInt(employeestatus_id) === 1) {
       const sent = await setupEmail(req, new_employee);
 
-      console.log({ sent });
+      // console.log({ sent });
       if (!sent) {
         await new_employee.destroy();
         throw new Error('setup Email failed. User not created');
@@ -196,7 +204,85 @@ const setPassword = async (req, res, next) => {
   }
 };
 
+const uploadProfilePic = async (req, res) => {
+  const log_obj = {
+    action: 'upload_profile_pic',
+    module: 'hris',
+    sub_module: 'onboarding',
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  const res_obj = { res, message: '', payload: {} };
+  const { user_id } = req.body;
+
+  try {
+    // Confirm user exists
+    const user = await User.findByPk(user_id);
+    const client = await Client.findOne({ where: { id: 1 } });
+    const company_name = client
+      ? client.dataValues.name + ' HRMS'
+      : 'Your Company';
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const file = req.files.image;
+
+    // Upload to Cloudinary using upload_stream (without public_id)
+    const streamUpload = () =>
+      new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: `${company_name}/profile_pics`,
+            transformation: [{ width: 500, height: 500, crop: 'limit' }],
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          },
+        );
+
+        stream.end(file.data); // stream from buffer
+      });
+
+    const result = await streamUpload();
+
+    // Deactivate old profile picture(s)
+    await UserProfilePic.update(
+      { status: 'inactive' },
+      { where: { user_id, status: 'active' } },
+    );
+
+    // Save new profile picture
+    const pic = await UserProfilePic.create({
+      user_id,
+      image_url: result.secure_url,
+      status: 'active',
+      created_by: req.decoded.id,
+    });
+
+    const message = 'Profile picture uploaded successfully';
+    res_obj.message = message;
+    res_obj.payload = { ...pic };
+
+    log_obj.payload = JSON.stringify({ ...pic });
+    logInfo(req, message, req.decoded?.id || user.id, log_obj);
+
+    returnSuccess(res_obj);
+  } catch (error) {
+    const message = error.message;
+    res_obj.message =
+      NODE_ENV === 'development' ? message : 'Something went wrong';
+
+    logError(req, message, req.decoded?.id, log_obj);
+    returnError(res_obj);
+  }
+};
+
 module.exports = {
   createEmployee,
   setPassword,
+  uploadProfilePic,
 };
