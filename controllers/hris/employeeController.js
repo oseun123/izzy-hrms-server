@@ -281,8 +281,116 @@ const uploadProfilePic = async (req, res) => {
   }
 };
 
+const getCurrentProfilePic = async (req, res) => {
+  const log_obj = {
+    action: 'get_current_profile_pic',
+    module: 'hris',
+    sub_module: 'onboarding',
+    payload: null,
+    description: null,
+    database: false,
+  };
+
+  const res_obj = { res, message: '', payload: {} };
+  const { user_id } = req.query;
+
+  try {
+    // Validate user_id
+    if (!user_id || isNaN(user_id)) {
+      throw new Error('A valid user_id is required');
+    }
+
+    //Confirm user exists
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    //Find active profile picture
+    const profilePic = await UserProfilePic.findOne({
+      where: { user_id, status: 'active' },
+    });
+
+    if (!profilePic) {
+      throw new Error('No active profile picture found');
+    }
+
+    const message = 'Current profile picture retrieved successfully';
+    res_obj.message = message;
+    res_obj.payload = { profile_pic: profilePic };
+
+    log_obj.payload = JSON.stringify(profilePic);
+    logInfo(req, message, req.decoded?.id || user.id, log_obj);
+
+    returnSuccess(res_obj);
+  } catch (error) {
+    const message = error.message;
+    res_obj.message =
+      NODE_ENV === 'development' ? message : 'Something went wrong';
+
+    logError(req, message, req.decoded?.id, log_obj);
+    returnError(res_obj);
+  }
+};
+
+const deleteProfilePic = async (req, res) => {
+  const log_obj = {
+    action: 'delete_profile_pic',
+    module: 'hris',
+    sub_module: 'onboarding',
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  const res_obj = { res, message: '', payload: {} };
+  const { user_id } = req.query;
+
+  try {
+    //  Validate user_id
+    if (!user_id || isNaN(user_id)) {
+      throw new Error('A valid user_id is required');
+    }
+
+    //Confirm user exists
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Get active profile picture
+    const pic = await UserProfilePic.findOne({
+      where: { user_id, status: 'active' },
+    });
+
+    if (!pic) {
+      throw new Error('No active profile picture found');
+    }
+
+    await pic.update({ status: 'inactive' });
+
+    const message = 'Profile picture deleted successfully';
+    res_obj.message = message;
+    res_obj.payload = { deleted_id: pic.id };
+
+    log_obj.payload = JSON.stringify({ deleted_id: pic.id });
+    logInfo(req, message, req.decoded?.id || user.id, log_obj);
+
+    returnSuccess(res_obj);
+  } catch (error) {
+    const message = error.message;
+    res_obj.message =
+      NODE_ENV === 'development' ? message : 'Something went wrong';
+
+    logError(req, message, req.decoded?.id, log_obj);
+    returnError(res_obj);
+  }
+};
+
 module.exports = {
   createEmployee,
   setPassword,
   uploadProfilePic,
+  getCurrentProfilePic,
+  deleteProfilePic,
 };

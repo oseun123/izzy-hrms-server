@@ -5,6 +5,8 @@ const {
   createEmployee,
   setPassword,
   uploadProfilePic,
+  getCurrentProfilePic,
+  deleteProfilePic,
 } = require('../controllers/hris/employeeController');
 const {
   validateCreateEmployee,
@@ -13,20 +15,23 @@ const {
 
 const router = express.Router();
 
-// permissions
+// employee
 router.post(
   '/create-employee',
   authorizeMiddleware,
   validateCreateEmployee,
   createEmployee,
 );
+
+router.post('/create-employee/setup-password', setPassword);
+
+// employee profile pic
 router.post(
   '/upload-employee-pic',
   authorizeMiddleware,
   validateProfilePicUpload,
   uploadProfilePic,
 );
-
-router.post('/create-employee/setup-password', setPassword);
-
+router.get('/get-employee-pic', authorizeMiddleware, getCurrentProfilePic);
+router.delete('/delete-employee-pic', authorizeMiddleware, deleteProfilePic);
 module.exports = router;
