@@ -76,6 +76,7 @@ const createEmployee = async (req, res, next) => {
       state_id,
       gender_id,
       setup_token,
+      created_by: req.decoded?.id,
     });
     // set defaultRole
     await setDefaultRole(new_employee);
@@ -387,10 +388,92 @@ const deleteProfilePic = async (req, res) => {
   }
 };
 
+const updateEmployee = async (req, res, next) => {
+  const log_obj = {
+    action: 'update_employee',
+    module: 'hris',
+    sub_module: 'onboarding',
+    payload: null,
+    description: null,
+    database: true,
+  };
+
+  const res_obj = { res, message: '', payload: {} };
+
+  try {
+    const { user_id } = req.body;
+
+    // Validate user_id
+    const parsedUserId = parseInt(user_id, 10);
+    if (!parsedUserId || parsedUserId <= 0) {
+      throw new Error('Invalid user_id provided');
+    }
+
+    // Find the active user
+    const employee = await User.findOne({
+      where: {
+        id: parsedUserId,
+        record_status: 'active',
+      },
+    });
+
+    if (!employee) {
+      throw new Error('Active user not found');
+    }
+
+    // Update employee fields
+    employee.set({
+      first_name: req.body.first_name,
+      middle_name: req.body.middle_name,
+      last_name: req.body.last_name,
+      email: req.body.email,
+      employee_number: req.body.employee_number,
+      employment_date: req.body.employment_date,
+      department_id: req.body.department_id,
+      grade_id: req.body.grade_id,
+      step_id: req.body.step_id,
+      branch_id: req.body.branch_id,
+      company_id: req.body.company_id,
+      designation_id: req.body.designation_id,
+      primary_supervisor: req.body.primary_supervisor,
+      secondary_supervisor: req.body.secondary_supervisor,
+      employeestatus_id: req.body.employeestatus_id,
+      employeecategory_id: req.body.employeecategory_id,
+      country_id: req.body.country_id,
+      state_id: req.body.state_id,
+      gender_id: req.body.gender_id,
+    });
+
+    await employee.save();
+
+    log_obj.payload = JSON.stringify(employee);
+    const message = 'Employee updated successfully';
+
+    const employeeData = employee.toJSON();
+    delete employeeData.password;
+
+    logInfo(req, message, req.decoded?.id || null, log_obj);
+    return res.status(200).send({
+      status: 'success',
+      message,
+      payload: { employee: employeeData },
+    });
+  } catch (error) {
+    const message = error.message;
+    logError(req, message, req.decoded?.id || null, log_obj);
+    return res.status(400).send({
+      status: 'error',
+      message,
+      payload: {},
+    });
+  }
+};
+
 module.exports = {
   createEmployee,
   setPassword,
   uploadProfilePic,
   getCurrentProfilePic,
   deleteProfilePic,
+  updateEmployee,
 };

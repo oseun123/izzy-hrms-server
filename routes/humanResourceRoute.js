@@ -7,6 +7,7 @@ const {
   uploadProfilePic,
   getCurrentProfilePic,
   deleteProfilePic,
+  updateEmployee,
 } = require('../controllers/hris/employeeController');
 const {
   validateCreateEmployee,
@@ -21,6 +22,12 @@ router.post(
   authorizeMiddleware,
   validateCreateEmployee,
   createEmployee,
+);
+router.post(
+  '/update-employee',
+  authorizeMiddleware,
+  validateCreateEmployee,
+  updateEmployee,
 );
 
 router.post('/create-employee/setup-password', setPassword);
