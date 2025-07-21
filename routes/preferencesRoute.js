@@ -105,6 +105,11 @@ router.get(
 );
 // users
 router.get('/users', authorizeMiddleware, usersController.systemUsers);
+router.get(
+  '/single-user',
+  authorizeMiddleware,
+  usersController.getSystemUserById,
+);
 
 // roles
 router.post(
