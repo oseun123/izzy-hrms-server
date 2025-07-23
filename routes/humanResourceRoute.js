@@ -41,4 +41,14 @@ router.post(
 );
 router.get('/get-employee-pic', authorizeMiddleware, getCurrentProfilePic);
 router.delete('/delete-employee-pic', authorizeMiddleware, deleteProfilePic);
+
+// employee contact
+
+router.post(
+  '/set-contact-info',
+  authorizeMiddleware,
+  validateContact,
+  createUserContact,
+);
+
 module.exports = router;
