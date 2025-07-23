@@ -93,7 +93,14 @@ module.exports = (sequelize, DataTypes) => {
         scope: {
           status: 'active',
         },
-        constraints: false,
+      });
+
+      User.hasOne(models.UserContact, {
+        foreignKey: 'user_id',
+        as: 'contact',
+        scope: {
+          is_authorized: true,
+        },
       });
     }
   }
