@@ -1,6 +1,7 @@
 const express = require('express');
 
 const { authorizeMiddleware } = require('../middleware/authorize');
+// users
 const {
   createEmployee,
   setPassword,
@@ -9,10 +10,15 @@ const {
   deleteProfilePic,
   updateEmployee,
 } = require('../controllers/hris/employeeController');
+
 const {
   validateCreateEmployee,
   validateProfilePicUpload,
 } = require('../middleware/hris/createEmployee');
+
+// user contact
+const { createUserContact } = require('../controllers/hris/contactController');
+const { validateContact } = require('../middleware/hris/createContact');
 
 const router = express.Router();
 
@@ -45,7 +51,7 @@ router.delete('/delete-employee-pic', authorizeMiddleware, deleteProfilePic);
 // employee contact
 
 router.post(
-  '/set-contact-info',
+  '/set-contact',
   authorizeMiddleware,
   validateContact,
   createUserContact,

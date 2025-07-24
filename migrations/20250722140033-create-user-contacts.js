@@ -57,14 +57,14 @@ module.exports = {
         allowNull: true,
       },
 
-      state: {
-        type: Sequelize.STRING,
-        allowNull: true,
+      state_id: {
+        type: Sequelize.INTEGER,
+        references: { model: 'states', key: 'id' },
       },
 
-      country: {
-        type: Sequelize.STRING,
-        allowNull: true,
+      country_id: {
+        type: Sequelize.INTEGER,
+        references: { model: 'countries', key: 'id' },
       },
 
       is_authorized: {
