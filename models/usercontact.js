@@ -5,16 +5,27 @@ const { Model, DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   class UserContact extends Model {
     static associate(models) {
-      // The contact belongs to a user (owner of the contact)
+      // Belongs to user (owner of contact info)
       this.belongsTo(models.User, {
         foreignKey: 'user_id',
         as: 'user',
       });
 
-      // The contact was created by a user (creator)
+      // Created by
       this.belongsTo(models.User, {
         foreignKey: 'created_by',
         as: 'creator',
+      });
+
+      // Optional: associate with state and country models
+      this.belongsTo(models.State, {
+        foreignKey: 'state_id',
+        as: 'state',
+      });
+
+      this.belongsTo(models.Country, {
+        foreignKey: 'country_id',
+        as: 'country',
       });
     }
   }
@@ -29,32 +40,17 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
-      house_number: {
-        type: DataTypes.STRING,
+      house_number: DataTypes.STRING,
+      street_name: DataTypes.STRING,
+      land_mark: DataTypes.STRING,
+      lga: DataTypes.STRING,
+      postal_code: DataTypes.STRING,
+      state_id: {
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
-      street_name: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      land_mark: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      lga: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      postal_code: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      state: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      country: {
-        type: DataTypes.STRING,
+      country_id: {
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
       is_authorized: {
