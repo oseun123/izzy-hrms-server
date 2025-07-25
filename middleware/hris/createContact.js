@@ -2,6 +2,7 @@ const { returnError } = require('../../utils/helper');
 const validator = require('validator');
 
 async function validateContact(req, res, next) {
+  console.log({ req: req.body });
   const {
     house_number,
     street_name,

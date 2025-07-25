@@ -1,5 +1,10 @@
-const { UserContact } = require('../../models');
-const { logInfo, logError } = require('../../utils/logger'); // adjust this to your project structure
+const { UserContact, User, State, Country } = require('../../models');
+const {
+  logInfo,
+  logError,
+  returnSuccess,
+  returnError,
+} = require('../../utils/helper');
 const { NODE_ENV } = process.env;
 
 const createUserContact = async (req, res) => {
@@ -51,25 +56,72 @@ const createUserContact = async (req, res) => {
     log_obj.payload = JSON.stringify(newContact);
 
     logInfo(req, message, req.decoded.id, log_obj);
-    return res.status(201).json({
-      status: 'success',
-      message,
-      payload: {
-        contact: newContact,
-      },
-    });
+    returnSuccess(res_obj);
   } catch (error) {
     const message =
       NODE_ENV === 'development' ? error.message : 'Something went wrong';
 
     logError(req, message, req.decoded?.id || null, log_obj);
 
-    return res.status(400).json({
-      status: 'error',
-      message,
-      payload: {},
-    });
+    returnError(res_obj);
   }
 };
 
-module.exports = { createUserContact };
+const getUserContact = async (req, res) => {
+  const log_obj = {
+    action: 'get_user_contact_info',
+    module: 'hris',
+    sub_module: 'contact',
+    payload: null,
+    description: null,
+    database: false,
+  };
+
+  const res_obj = { res, message: '', payload: {} };
+
+  try {
+    const user_id = req.query.user_id || req.decoded?.id;
+
+    if (!user_id || isNaN(user_id)) {
+      throw new Error('A valid user_id is required');
+    }
+
+    // Confirm user exists
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Get authorized contact info with state and country
+    const contact = await UserContact.findOne({
+      where: {
+        user_id,
+        is_authorized: true,
+      },
+      include: [
+        { model: State, as: 'state', attributes: ['id', 'name'] },
+        { model: Country, as: 'country', attributes: ['id', 'name'] },
+      ],
+    });
+
+    if (!contact) {
+      throw new Error('No authorized contact info found');
+    }
+
+    const message = 'Contact information retrieved successfully';
+    res_obj.message = message;
+    res_obj.payload = { contact };
+    log_obj.payload = JSON.stringify(contact);
+
+    logInfo(req, message, req.decoded?.id || user.id, log_obj);
+    returnSuccess(res_obj);
+  } catch (error) {
+    const message = error.message;
+    res_obj.message =
+      NODE_ENV === 'development' ? message : 'Something went wrong';
+    logError(req, message, req.decoded?.id, log_obj);
+    returnError(res_obj);
+  }
+};
+
+module.exports = { createUserContact, getUserContact };
