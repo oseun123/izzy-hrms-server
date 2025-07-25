@@ -17,7 +17,10 @@ const {
 } = require('../middleware/hris/createEmployee');
 
 // user contact
-const { createUserContact } = require('../controllers/hris/contactController');
+const {
+  createUserContact,
+  getUserContact,
+} = require('../controllers/hris/contactController');
 const { validateContact } = require('../middleware/hris/createContact');
 
 const router = express.Router();
@@ -56,5 +59,6 @@ router.post(
   validateContact,
   createUserContact,
 );
+router.get('/get-contact', authorizeMiddleware, getUserContact);
 
 module.exports = router;
